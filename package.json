@@ -1,0 +1,16 @@
+{
+  "name": "frontend-e2e-tests-env",
+  "version": "1.0.0",
+  "description": "Библиотека для е2е-тестирования. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "chai": "3.5.0",
+    "expect": "1.20.2",
+    "mocha": "3.2.0",
+    "phantomjs-prebuilt": "2.1.14-fb-1.0.0"
+  }
+}
