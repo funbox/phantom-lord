@@ -68,7 +68,15 @@ class RemoteBrowser extends EventEmitter {
 
   waitForText(text, onTimeout) {
     return this.waitFor(() => {
-      return this.getPlainText().then((pageText) => pageText.indexOf(text) > -1 ? Promise.resolve() : Promise.reject());
+      return new Promise((resolve, reject) => {
+        this.getPlainText().then((pageText) => {
+          if (pageText.indexOf(text) > -1) {
+            resolve();
+          } else {
+            reject(`Error: waitForText('${text}')`);
+          }
+        });
+      })
     }, onTimeout);
   }
 
@@ -80,10 +88,18 @@ class RemoteBrowser extends EventEmitter {
     return this.waitFor(() => this.checkSelectorNotExists(selector), onTimeout);
   }
 
-  waitWhileText(selector, onTimeout) {
+  waitWhileText(text, onTimeout) {
     return this.waitFor(() => {
-      return this.getPlainText().then((pageText) => pageText.indexOf(text) == -1 ? Promise.resolve() : Promise.reject());
-    }, onTimeout);
+      return new Promise((resolve, reject) => {
+        this.getPlainText().then((pageText) => {
+          if (pageText.indexOf(text) == -1) {
+            resolve();
+          } else {
+            reject(`Error: waitWhileText('${text}')`);
+          }
+        })
+      })
+    }, onTimeout)
   }
 
   waitForUrl(url, onTimeout) {
@@ -93,7 +109,7 @@ class RemoteBrowser extends EventEmitter {
           if (url.exec && url.exec(currentUrl) || currentUrl.indexOf(url) !== -1) {
             resolve();
           } else {
-            reject();
+            reject(`Error: waitForUrl('${url}')`);
           }
         });
       });
@@ -135,14 +151,14 @@ class RemoteBrowser extends EventEmitter {
     }
     return this.then(() => {
       return new Promise((resolve, reject) => {
-        const condNotSatisfied = () => {
+        const condNotSatisfied = (error) => {
           const currentTime = +new Date();
 
           if (currentTime - startWaitingTime < this.WAIT_TIMEOUT) {
             setTimeout(() => waiter(), this.CHECK_INTERVAL);
           } else {
             onTimeout && onTimeout();
-            this.emit('timeout');
+            this.emit('timeout', error);
             resolve();
           }
         }
@@ -152,8 +168,8 @@ class RemoteBrowser extends EventEmitter {
           if (res && res.then) {
             res.then(() => {
               resolve();
-            }, () => {
-              condNotSatisfied();
+            }, (error) => {
+              condNotSatisfied(error);
             });
           } else {
             if (res) {
@@ -187,7 +203,7 @@ class RemoteBrowser extends EventEmitter {
             resolve();
           } else {
             debug(`click error: ${resp.status}`);
-            reject();
+            reject(`Error: click(${selector})`);
           }
         });
       });
@@ -214,7 +230,7 @@ class RemoteBrowser extends EventEmitter {
             resolve();
           } else {
             debug(`click error: ${resp.status}`);
-            reject();
+            reject(`Error: sendKeys(${selector}, ${keys}, ${options})`);
           }
         });
       });
@@ -267,7 +283,10 @@ class RemoteBrowser extends EventEmitter {
       };
 
       if (stepRes && stepRes.then) {
-        stepRes.then(processNext, () => { debug('step processing failed'); });
+        stepRes.then(processNext, () => {
+          debug('step processing failed');
+          throw new Error('step processing failed');
+        });
       } else {
         processNext(stepRes);
       }
@@ -298,7 +317,7 @@ class RemoteBrowser extends EventEmitter {
         if (resp.status == 'ok') {
           resolve();
         } else {
-          reject();
+          reject(`Error: Expected selector '${selector}' do not exist`);
         }
       });
     });
@@ -310,7 +329,7 @@ class RemoteBrowser extends EventEmitter {
         if (resp.status == 'notFound') {
           resolve();
         } else {
-          reject();
+          reject(`Error: Expected selector '${selector}' exists`);
         }
       });
     });
@@ -322,7 +341,7 @@ class RemoteBrowser extends EventEmitter {
         if (resp.status == 'ok') {
           resolve();
         } else {
-          reject();
+          reject(`Error: Expected selector '${selector}' is not visible`);
         }
       });
     });
@@ -362,7 +381,7 @@ class RemoteBrowser extends EventEmitter {
           if (resp.status == 'ok') {
             resolve();
           } else {
-            reject();
+            reject(`Error: addStubToQueue(${stub.method} ${stub.url})`);
           }
         });
       });
@@ -376,7 +395,7 @@ class RemoteBrowser extends EventEmitter {
           if (resp.status == 'ok') {
             resolve();
           } else {
-            reject();
+            reject(`Error: addTestSetting(${setting}, ${stub.value})`);
           }
         });
       });
@@ -396,7 +415,7 @@ class RemoteBrowser extends EventEmitter {
           if (resp.status == 'ok') {
             resolve();
           } else {
-            reject();
+            reject(`Error: capture(${filename})`);
           }
         });
       });
@@ -432,8 +451,7 @@ class RemoteBrowser extends EventEmitter {
           if (foundCount === expectedCount) {
             resolve();
           } else {
-            // console.log('ERROR: Expected count of \'' + selector + '\' to be ' + expectedCount + ', but it was ' + foundCount)
-            reject();
+            reject(`Error: Expected count of '${selector}' to be '${expectedCount}', but it was '${foundCount}`);
           }
         });
       });
@@ -451,8 +469,7 @@ class RemoteBrowser extends EventEmitter {
         if (actualValue === expectedValue) {
           resolve();
         } else {
-          // console.log('Expected value of \'' + selector + '\' to be "' + expectedValue + '", but it was "' + actualValue + '"', 'ERROR');
-          reject();
+          reject(`Error: Expected value of '${selector}' to be '${expectedValue}', but it was '${actualValue}`);
         }
       })
     })
@@ -470,7 +487,7 @@ class RemoteBrowser extends EventEmitter {
         if (exactMatch && value === expectedText || !exactMatch && value.indexOf(expectedText) >= 0) {
           resolve()
         } else {
-          reject();
+          reject(`Error: Expected text of '${selector}' to be '${expectedText}', but it was '${value}`);
         }
       })
     })
@@ -507,7 +524,7 @@ class RemoteBrowser extends EventEmitter {
           if (resp.status == 'ok') {
             resolve();
           } else {
-            reject();
+            reject(`Error: fillForm('${selector}', '${vals}', '${options}')`);
           }
         });
       });
@@ -520,7 +537,6 @@ class RemoteBrowser extends EventEmitter {
       selectorType: 'css'
     });
   }
-
 };
 
 
