@@ -238,13 +238,26 @@ class RemoteBrowser extends EventEmitter {
   }
 
   exit() {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.sendCmd({name: 'exit'}, (resp) => {
+    const startWaitingTime = +new Date();
+    return new Promise((resolve, reject) => {
+      const notKilled = () => {
+        const currentTime = +new Date();
+        if (currentTime - startWaitingTime < this.WAIT_TIMEOUT) {
+          setTimeout(() => waiter(), this.CHECK_INTERVAL);
+        } else {
           this.server.kill();
+          reject();
+        }
+      };
+
+      const waiter = () => {
+        if (this.state === 'notStarted') {
           resolve();
-        });
-      });
+        } else notKilled();
+      };
+
+      this.server.kill();
+      waiter();
     });
   }
 
