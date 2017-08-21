@@ -4,7 +4,7 @@ const EventEmitter = require('events').EventEmitter;
 const utils = require('./utils.js');
 RegExp.prototype.toJSON = function() { return 're:' + this.source; }; // для сохранения regexp в моках
 const f = utils.format;
-var browserArgs = JSON.parse(process.env.BROWSER_ARGS);
+var browserArgs = JSON.parse(process.env.BROWSER_ARGS || '{}');
 
 function debug(str) {
   if (process.env.DEBUG) {
