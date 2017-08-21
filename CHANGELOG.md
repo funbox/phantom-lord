@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1 (21.08.2017)
+
+* Fixed tests filtering.
+
 ## 1.2.0 (16.08.2017)
 
 * Add waiting for server process finish.
