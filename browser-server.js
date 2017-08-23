@@ -20,12 +20,12 @@ var height = browserArgs.viewportHeight || 900;
 page.viewportSize = {width: width, height: height};
 var stubsQueue = [];
 var testSettings = {};
+var isInitialized = false;
 
 while (!listening) {
   var listening = server.listen(port, processRequest);
 
   if (!listening) {
-    console.log("Error starting server at " + port);
     port++;
     if (port > END_PORT) {
       console.log("Can't start server, exiting");
@@ -45,7 +45,7 @@ page.onUrlChanged = function() {
 };
 
 page.onInitialized = function onInitialized() {
-  console.log('page.initialized');
+  isInitialized = true;
   page.evaluate(function(settings) {
       window.test = settings;
     }, testSettings);
@@ -229,7 +229,15 @@ function processCmd(cmd, response) {
     },
 
     addStubToQueue: function() {
-      stubsQueue.push(cmd.params.stub);
+      var stub = cmd.params.stub;
+      if (isInitialized) {
+        page.evaluate(function(method, url, data) {
+          window.mocks = window.mocks || [];
+          window.mocks.push({ method: method, url: url, data: data });
+        }, stub.method, stub.url, stub.data);
+      } else {
+        stubsQueue.push(stub);
+      }
       respondWith({status: 'ok'});
     },
 

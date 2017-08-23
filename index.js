@@ -38,9 +38,6 @@ class RemoteBrowser extends EventEmitter {
         this.stepInsertOffset = 1;
         this.processSteps();
       }
-      if (data.indexOf('page.initialized') > -1) {
-        this.emit('page.initialized');
-      }
     });
 
     this.server.on('close', (code) => {
@@ -377,14 +374,6 @@ class RemoteBrowser extends EventEmitter {
         cb(JSON.parse(body));
       }
     });
-  }
-
-  injectStubIntoApp(stub) {
-    this.evaluate(function(method, url, data) {
-      
-      window.mocks = window.mocks || [];
-      window.mocks.push({ method: method, url: url, data: data });
-    }, stub.method, stub.url, stub.data);
   }
 
   addStubToQueue(stub) {
