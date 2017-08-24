@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.2 (24.08.2017)
+
+* Moved mocks logic into the browser.
+* Fixed waitForSelectorText & waitForSelectorValue.
+
 ## 1.2.1 (21.08.2017)
 
 * Fixed tests filtering.
