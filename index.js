@@ -345,6 +345,30 @@ class RemoteBrowser extends EventEmitter {
     });
   }
 
+  checkSelectorText(selector, text, exactMatch = false) {
+    return new Promise((resolve, reject) => {
+      this.sendCmd({name: 'checkSelectorText', params: {selector, text, exactMatch}}, (resp) => {
+        if (resp.status == 'ok') {
+          resolve();
+        } else {
+          reject(`Error: Expected text of '${selector}' to be '${text}', but it was '${resp.text}'`);
+        }
+      });
+    });
+  }
+
+  checkSelectorValue(selector, value) {
+    return new Promise((resolve, reject) => {
+      this.sendCmd({name: 'checkSelectorValue', params: {selector, value}}, (resp) => {
+        if (resp.status == 'ok') {
+          resolve();
+        } else {
+          reject(`Error: Expected value of '${selector}' to be '${value}', but it was '${resp.value}'`);
+        }
+      });
+    });
+  }
+    
   checkVisibility(selector) {
     return new Promise((resolve, reject) => {
       this.sendCmd({name: 'checkVisibility', params: {selector}}, (resp) => {
@@ -453,47 +477,21 @@ class RemoteBrowser extends EventEmitter {
           if (foundCount === expectedCount) {
             resolve();
           } else {
-            reject(`Error: Expected count of '${selector}' to be '${expectedCount}', but it was '${foundCount}`);
+            reject(`Error: Expected count of '${selector}' to be '${expectedCount}', but it was '${foundCount}'`);
           }
         });
       });
     }, onTimeout);
   }
 
-  waitForSelectorValue(selector, expectedValue, onTimeout) {
-    return new Promise((resolve, reject) => {
-      this.waitForSelector(selector);
-      this.evaluate(function(evSelector) {
-          var el = window.__utils__.findOne(evSelector);
-          return el ? el.value : undefined;
-        }, selector);
-      this.then((actualValue) => {
-        if (actualValue === expectedValue) {
-          resolve();
-        } else {
-          reject(`Error: Expected value of '${selector}' to be '${expectedValue}', but it was '${actualValue}`);
-        }
-      })
-    })
+  waitForSelectorText(selector, expectedText, exactMatch, onTimeout) {
+    return this.waitFor(() => this.checkSelectorText(selector, expectedText, exactMatch), onTimeout);
   }
 
-  waitForSelectorText(selector, expectedText, exactMatch) {
-    var exactMatch = (typeof exactMatch === 'undefined') ? false : exactMatch;
-    return new Promise((resolve, reject) => {
-      this.waitForSelector(selector);
-      this.evaluate(function(evSelector) {
-        var text = window.__utils__.fetchText(evSelector);
-        return text;
-      }, selector);
-      this.then((value) => {
-        if (exactMatch && value === expectedText || !exactMatch && value.indexOf(expectedText) >= 0) {
-          resolve()
-        } else {
-          reject(`Error: Expected text of '${selector}' to be '${expectedText}', but it was '${value}`);
-        }
-      })
-    })
+  waitForSelectorValue(selector, expectedText, onTimeout) {
+    return this.waitFor(() => this.checkSelectorValue(selector, expectedText), onTimeout);
   }
+  
 
   scrollSelectorToTop(selectorArg) {
     this.evaluate(function(selector) {

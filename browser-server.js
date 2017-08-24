@@ -149,6 +149,32 @@ function processCmd(cmd, response) {
       respondWith({status: res ? 'ok': 'notFound'});
     },
 
+    checkSelectorText: function() {
+      var res = page.evaluate(function(sel) {
+        return __utils__.fetchText(sel);
+      }, cmd.params.selector);
+      var text = cmd.params.text;
+      var exactMatch = cmd.params.exactMatch;
+      if (exactMatch && res === text || !exactMatch && res.indexOf(text) >= 0) {
+        respondWith({status: 'ok'});
+      } else {
+        respondWith({status: 'notFound', text: res});
+      }
+    },
+
+    checkSelectorValue: function() {
+      var res = page.evaluate(function(sel) {
+        var el = window.__utils__.findOne(sel);
+        return el ? el.value : undefined;
+      }, cmd.params.selector);
+      var value = cmd.params.value;
+      if (res === value) {
+        respondWith({status: 'ok'});
+      } else {
+        respondWith({status: 'notEqual', value: res});
+      }
+    },
+
     checkVisibility: function() {
       var res = page.evaluate(function(sel) {
         return __utils__.visible(sel);
