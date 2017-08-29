@@ -2,6 +2,7 @@ const spawn = require('child_process').spawn;
 const request = require('request');
 const EventEmitter = require('events').EventEmitter;
 const utils = require('./utils.js');
+const util = require('util');
 RegExp.prototype.toJSON = function() { return 're:' + this.source; }; // для сохранения regexp в моках
 const f = utils.format;
 var browserArgs = JSON.parse(process.env.BROWSER_ARGS || '{}');
@@ -23,15 +24,16 @@ class RemoteBrowser extends EventEmitter {
   startRemoteBrowser() {
     if (this.state != 'notStarted') return;
     this.state = 'starting';
-    
+
     debug('start remote server');
     this.server = spawn('./node_modules/phantomjs-prebuilt/bin/phantomjs', ['./node_modules/frontend-e2e-tests-env/browser-server.js', process.env.BROWSER_ARGS]);
     this.server.stderr.on('data', (data) => {
-      process.stdout.write(data.toString('utf8'));
+      process.stdout.write(`phantom ${this.server.pid}: ${data.toString('utf8')}`);
     });
+    debug(`server pid: ${this.server.pid}`);
 
     this.server.stdout.on('data', (data) => {
-      process.stdout.write(data.toString('utf8'));
+      process.stdout.write(`phantom ${this.server.pid}: ${data.toString('utf8')}`);
       if (data.indexOf('Server started') > -1) {
         this.port = /Server started at (\d+)/.exec(data)[1];
         this.state = 'started';
@@ -40,9 +42,19 @@ class RemoteBrowser extends EventEmitter {
       }
     });
 
-    this.server.on('close', (code) => {
-      debug(`child process exited with code ${code}`);
+    this.server.on('close', (code, signal) => {
+      debug(`server ${this.server.pid} closed with code: ${code}, signal: ${signal}`);
       this.state = 'notStarted';
+    });
+
+    this.server.on('exit', (code, signal) => {
+      debug(`server ${this.server.pid} exited with code: ${code}, signal: ${signal}`);
+      this.state = 'notStarted';
+    });
+
+    this.server.on('error', (err) => {
+      debug(`server ${this.server.pid} emitted an error: ${util.inspect(err, {depth: null})}`);
+      this.state = 'error';
     });
 
     // TODO: Добавить отлуп каспера по таймауту
@@ -238,11 +250,12 @@ class RemoteBrowser extends EventEmitter {
     const startWaitingTime = +new Date();
     return new Promise((resolve, reject) => {
       const notKilled = () => {
+        debug(`server ${this.server.pid} state: ${this.state}`);
+
         const currentTime = +new Date();
         if (currentTime - startWaitingTime < this.WAIT_TIMEOUT) {
           setTimeout(() => waiter(), this.CHECK_INTERVAL);
         } else {
-          this.server.kill();
           reject();
         }
       };
@@ -368,7 +381,7 @@ class RemoteBrowser extends EventEmitter {
       });
     });
   }
-    
+
   checkVisibility(selector) {
     return new Promise((resolve, reject) => {
       this.sendCmd({name: 'checkVisibility', params: {selector}}, (resp) => {
@@ -487,7 +500,6 @@ class RemoteBrowser extends EventEmitter {
   waitForSelectorValue(selector, expectedText, onTimeout) {
     return this.waitFor(() => this.checkSelectorValue(selector, expectedText), onTimeout);
   }
-  
 
   scrollSelectorToTop(selectorArg) {
     this.evaluate(function(selector) {

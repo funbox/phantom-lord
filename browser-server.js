@@ -21,6 +21,7 @@ page.viewportSize = {width: width, height: height};
 var stubsQueue = [];
 var testSettings = {};
 var isInitialized = false;
+cmdId = 0;
 
 while (!listening) {
   var listening = server.listen(port, processRequest);
@@ -96,6 +97,8 @@ function processRequest(request, response) {
   response.headers = {"Cache": "no-cache", "Content-Type": "application/json"};
   response.statusCode = 200;
   if (cmd) {
+    ++cmdId;
+    console.log('received cmd:',cmdId, cmd.name);
     processCmd(cmd, response);
   } else {
     response.write(JSON.stringify({status: 'cmdParseError'}));
