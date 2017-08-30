@@ -435,31 +435,27 @@ class RemoteBrowser extends EventEmitter {
   }
 
   capture(filename) {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.sendCmd({name: 'capture', params: {filename}}, (resp) => {
-          if (resp.status == 'ok') {
-            resolve();
-          } else {
-            reject(`Error: capture(${filename})`);
-          }
-        });
+    return new Promise((resolve, reject) => {
+      this.sendCmd({name: 'capture', params: {filename}}, (resp) => {
+        if (resp.status == 'ok') {
+          resolve();
+        } else {
+          reject(`Error: capture(${filename})`);
+        }
       });
-    })
+    });
   }
 
   captureInPath(path) {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.sendCmd({name: 'captureInPath', params: {path}}, (resp) => {
-          if (resp.status == 'ok') {
-            resolve();
-          } else {
-            reject();
-          }
-        });
+    return new Promise((resolve, reject) => {
+      this.sendCmd({name: 'captureInPath', params: {path}}, (resp) => {
+        if (resp.status == 'ok') {
+          resolve();
+        } else {
+          reject();
+        }
       });
-    })
+    });
   }
 
   getCount(selector) {
