@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0 (31.08.2017)
+
+* Removed `then()` wrapping for capturing methods.
+
 ## 1.2.2 (24.08.2017)
 
 * Moved mocks logic into the browser.
