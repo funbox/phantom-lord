@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.1 (01.09.2017)
+
+* Limited printing Phantom.JS logs. Now they're shown only when env variable is passed.
+
 ## 1.5.0 (01.09.2017)
 
 * Added exit event emitting for PhantomJS finishing.
