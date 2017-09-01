@@ -27,12 +27,16 @@ class RemoteBrowser extends EventEmitter {
     debug('start remote server');
     this.server = spawn('./node_modules/phantomjs-prebuilt/bin/phantomjs', ['./node_modules/frontend-e2e-tests-env/browser-server.js', process.env.BROWSER_ARGS]);
     this.server.stderr.on('data', (data) => {
-      process.stdout.write(`phantom ${this.server.pid}: ${data.toString('utf8')}`);
+      if (process.env.DEBUG || process.env.PHANTOM_OUTPUT) {
+        process.stdout.write(`phantom ${this.server.pid}: ${data.toString('utf8')}`);
+      }
     });
-    debug(`server pid: ${this.server.pid}`);
 
     this.server.stdout.on('data', (data) => {
-      process.stdout.write(`phantom ${this.server.pid}: ${data.toString('utf8')}`);
+      if (process.env.DEBUG || process.env.PHANTOM_OUTPUT) {
+        process.stdout.write(`phantom ${this.server.pid}: ${data.toString('utf8')}`);
+      }
+
       if (data.indexOf('Server started') > -1) {
         this.port = /Server started at (\d+)/.exec(data)[1];
         this.state = 'started';
@@ -40,6 +44,8 @@ class RemoteBrowser extends EventEmitter {
         this.processSteps();
       }
     });
+
+    debug(`server pid: ${this.server.pid}`);
 
     this.server.on('close', (code, signal) => {
       debug(`server ${this.server.pid} closed with code: ${code}, signal: ${signal}`);
