@@ -2,7 +2,6 @@ const spawn = require('child_process').spawn;
 const request = require('request');
 const EventEmitter = require('events').EventEmitter;
 const utils = require('./utils.js');
-const util = require('util');
 RegExp.prototype.toJSON = function() { return 're:' + this.source; }; // для сохранения regexp в моках
 const f = utils.format;
 var browserArgs = JSON.parse(process.env.BROWSER_ARGS || '{}');
@@ -52,8 +51,8 @@ class RemoteBrowser extends EventEmitter {
       this.state = 'notStarted';
     });
 
-    this.server.on('error', (err) => {
-      debug(`server ${this.server.pid} emitted an error: ${util.inspect(err, {depth: null})}`);
+    this.server.on('phantomError', (err) => {
+      debug(`server ${this.server.pid} emitted an error: ${err}`);
       this.state = 'error';
     });
 
@@ -67,8 +66,7 @@ class RemoteBrowser extends EventEmitter {
           if (resp.status == 'ok') {
             resolve();
           } else {
-            debug(`open page error: ${resp.status}`);
-            this.emit('error');
+            reject(`open page error: ${resp.status}`);
           }
         });
       });
@@ -167,12 +165,12 @@ class RemoteBrowser extends EventEmitter {
             setTimeout(() => waiter(), this.CHECK_INTERVAL);
           } else {
             onTimeout && onTimeout();
-            this.emit('timeout', error);
-            resolve();
+            reject({type: 'timeout', data: error});
           }
         }
 
         const waiter = () => {
+          // TODO: Добавить try/catch
           const res = fn();
           if (res && res.then) {
             res.then(() => {
@@ -306,9 +304,9 @@ class RemoteBrowser extends EventEmitter {
       };
 
       if (stepRes && stepRes.then) {
-        stepRes.then(processNext, () => {
-          debug('step processing failed');
-          throw new Error('step processing failed');
+        stepRes.then(processNext, (e) => {
+          debug(`processing step ${this.currentStep} of ${this.steps.length} failed`);
+          this.emit('error', e);
         });
       } else {
         processNext(stepRes);
@@ -406,7 +404,7 @@ class RemoteBrowser extends EventEmitter {
       if (error) {
         const error = `Error while processing cmd: ${JSON.stringify(cmd)}`;
         debug(error);
-        this.emit('error', error);
+        this.emit('phantomError', error);
       } else {
         cb(JSON.parse(body));
       }
@@ -502,14 +500,14 @@ class RemoteBrowser extends EventEmitter {
   }
 
   scrollSelectorToTop(selectorArg) {
-    this.evaluate(function(selector) {
+    return this.evaluate(function(selector) {
       var el = window.__utils__.findOne(selector);
       el.scrollTop = 0;
     }, selectorArg);
   }
 
   scrollSelectorToBottom(selectorArg) {
-    this.evaluate(function(selector) {
+    return this.evaluate(function(selector) {
       var el = window.__utils__.findOne(selector);
       el.scrollTop = el.scrollHeight;
     }, selectorArg);
