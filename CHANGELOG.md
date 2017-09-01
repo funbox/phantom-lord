@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.0 (01.09.2017)
+
+* Added exit event emitting for PhantomJS finishing.
+
 ## 1.4.0 (01.09.2017)
 
 * Move PhantomJS error into the separated event. 
