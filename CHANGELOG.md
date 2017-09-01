@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0 (01.09.2017)
+
+* Move PhantomJS error into the separated event. 
+  Now `error` is an ordinary error which should fail the test,
+  while `phantomError` is something horrible that is not related to the test itself.
+* Added debug info.
+
 ## 1.3.0 (31.08.2017)
 
 * Removed `then()` wrapping for capturing methods.
