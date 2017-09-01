@@ -44,11 +44,13 @@ class RemoteBrowser extends EventEmitter {
     this.server.on('close', (code, signal) => {
       debug(`server ${this.server.pid} closed with code: ${code}, signal: ${signal}`);
       this.state = 'notStarted';
+      this.emit('exit', code, signal);
     });
 
     this.server.on('exit', (code, signal) => {
       debug(`server ${this.server.pid} exited with code: ${code}, signal: ${signal}`);
       this.state = 'notStarted';
+      this.emit('exit', code, signal);
     });
 
     this.server.on('phantomError', (err) => {
