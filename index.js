@@ -49,14 +49,14 @@ class RemoteBrowser extends EventEmitter {
 
     this.server.on('close', (code, signal) => {
       debug(`server ${this.server.pid} closed with code: ${code}, signal: ${signal}`);
-      this.state = 'notStarted';
       this.emit('exit', code, signal);
+      this.state = 'notStarted';
     });
 
     this.server.on('exit', (code, signal) => {
       debug(`server ${this.server.pid} exited with code: ${code}, signal: ${signal}`);
-      this.state = 'notStarted';
       this.emit('exit', code, signal);
+      this.state = 'notStarted';
     });
 
     this.server.on('phantomError', (err) => {
@@ -253,6 +253,8 @@ class RemoteBrowser extends EventEmitter {
   }
 
   exit() {
+    this.state = 'exiting';
+
     const startWaitingTime = +new Date();
     return new Promise((resolve, reject) => {
       const notKilled = () => {
