@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.0 (28.09.2017)
+
+* Added setting `state = exiting` when `exit` fn is fired.
+
 ## 1.5.1 (01.09.2017)
 
 * Limited printing Phantom.JS logs. Now they're shown only when env variable is passed.
