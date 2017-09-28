@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.0 (28.09.2017)
+
+* Improved timeouts and errors generation.
+
 ## 1.6.0 (28.09.2017)
 
 * Added setting `state = exiting` when `exit` fn is fired.
