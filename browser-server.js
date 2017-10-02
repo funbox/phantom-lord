@@ -23,6 +23,8 @@ var testSettings = {};
 var isInitialized = false;
 cmdId = 0;
 
+var browserErrors = [];
+
 while (!listening) {
   var listening = server.listen(port, processRequest);
 
@@ -62,29 +64,31 @@ page.onInitialized = function onInitialized() {
 
 };
 // Включение вывода console.log с сайта
-// page.onConsoleMessage = function(msg, lineNum, sourceId) {
-//   console.log('CONSOLE: ' + msg);
-// };
+page.onConsoleMessage = function(msg, lineNum, sourceId) {
+  console.log('CONSOLE: ' + msg);
+};
 
 page.onError = function(msg, trace) {
   var notCriticalErrors = [
-      'ymaps: script not loaded',
-      '[WDS] Disconnected!',
-    ];
+    'ymaps: script not loaded',
+    '[WDS] Disconnected!',
+  ];
+
   if (notCriticalErrors.indexOf(msg) >= 0) {
     console.log('Некритическая ошибка: ' + msg);
-    return;
-  }
-  var msgStack = ['ERROR: ' + msg];
+  } else {
+    browserErrors.push({msg: msg, trace: trace});
 
-  if (trace && trace.length) {
-    msgStack.push('TRACE:');
-    trace.forEach(function(t) {
-      msgStack.push(' -> ' + t.file + ': ' + t.line + (t.function ? ' (in function "' + t.function +'")' : ''));
-    });
-  }
+    var msgStack = ['ERROR: ' + msg];
 
-  console.log(msgStack.join('\n'));
+    if (trace && trace.length) {
+      msgStack.push('TRACE:');
+      trace.forEach(function(t) {
+        msgStack.push(' -> ' + t.file + ': ' + t.line + (t.function ? ' (in function "' + t.function +'")' : ''));
+      });
+    }
+    console.log(msgStack.join('\n'));
+  }
 };
 
 function processRequest(request, response) {
@@ -108,6 +112,11 @@ function processRequest(request, response) {
 
 function processCmd(cmd, response) {
   function respondWith(data) {
+    if (browserErrors.length > 0) {
+      data.browserErrors = browserErrors;
+      browserErrors = [];
+    }
+
     response.write(JSON.stringify(data));
     response.close();
   }
@@ -224,7 +233,7 @@ function processCmd(cmd, response) {
       var isTextArea = tag === 'textarea';
       var isValidInput = tag === 'input' && (typeof type === 'undefined' || supported.indexOf(type) !== -1);
       var isContentEditable = !!elemInfos.attributes.contenteditable;
-    
+
       var modifiers = utils.computeModifier(options && options.modifiers,
                                           page.event.modifier);
       page.sendEvent('keypress', keys, null, null, modifiers);
@@ -250,7 +259,7 @@ function processCmd(cmd, response) {
       var dir = p.slice(0, p.length - 1).join('/');
       if (!fs.exists(dir)) {
         fs.makeTree(dir);
-      }      
+      }
       var fname = p.join('/') + '.png';
       var filename = fs.absolute(fname);
       page.render(filename);
