@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.0 (03.10.2017)
+
+* Added browserError event to handle JS errors of test pages.
+
 ## 1.7.0 (28.09.2017)
 
 * Improved timeouts and errors generation.
