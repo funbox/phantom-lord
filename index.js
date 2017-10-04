@@ -41,6 +41,8 @@ class RemoteBrowser extends EventEmitter {
         this.port = /Server started at (\d+)/.exec(data)[1];
         this.state = 'started';
         this.stepInsertOffset = 1;
+
+        console.log(`phantom ${this.server.pid} port is ${this.port}, start processing steps`);
         this.processSteps();
       }
     });
