@@ -1,8 +1,12 @@
 # Changelog
 
+## 1.11.0 (04.10.2017)
+
+* Changed used ports range to prevent conflicts on CI.
+
 ## 1.10.0 (04.10.2017)
 
-* Increased using ports range.
+* Increased used ports range.
 
 ## 1.9.0 (04.10.2017)
 
