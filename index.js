@@ -53,12 +53,14 @@ class RemoteBrowser extends EventEmitter {
       debug(`server ${this.server.pid} closed with code: ${code}, signal: ${signal}`);
       this.emit('exit', code, signal);
       this.state = 'notStarted';
+      this.server = null;
     });
 
     this.server.on('exit', (code, signal) => {
       debug(`server ${this.server.pid} exited with code: ${code}, signal: ${signal}`);
       this.emit('exit', code, signal);
       this.state = 'notStarted';
+      this.server = null;
     });
 
     this.server.on('phantomError', (err) => {
@@ -255,6 +257,11 @@ class RemoteBrowser extends EventEmitter {
   }
 
   exit() {
+    if (!this.server) {
+      this.state = 'notStarted';
+      return Promise.resolve();
+    }
+
     this.state = 'exiting';
 
     const startWaitingTime = +new Date();
@@ -413,8 +420,16 @@ class RemoteBrowser extends EventEmitter {
     });
   }
 
+  // TODO: Зарефакторить эту функцию, сделать поведение более простым, сейчас иногда cb вызывается, иногда - нет, что не очень хорошо
   sendCmd(cmd, cb) {
     debug(`processing cmd: ${JSON.stringify(cmd)}`);
+
+    if (this.state !== 'started') {
+      console.log(`Can't process cmd because server state = ${this.state}`);
+      cb({status: 'notStarted'});
+      return;
+    }
+
     request.post({
       method: 'POST',
       url: 'http://localhost:' + this.port,
