@@ -7,8 +7,8 @@ var waiters = [];
 
 var CHECK_INTERVAL = 50;
 
-var START_PORT = 10000;
-var END_PORT = 10100;
+var START_PORT = 10100;
+var END_PORT = 10200;
 var port = START_PORT;
 var listening = false;
 var system = require('system');
