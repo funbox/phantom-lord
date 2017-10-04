@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.10.0 (04.10.2017)
+
+* Increased using ports range.
+
 ## 1.9.0 (04.10.2017)
 
 * Improved PhantomJS not-started state handling.
