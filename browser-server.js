@@ -96,7 +96,7 @@ function processRequest(request, response) {
   try {
     cmd = JSON.parse(request.post);
   } catch(e) {
-    console.log("Error: " + JSON.stringify(e));
+    console.log("Error: " + JSON.stringify(e) + ", original string: " + request.post);
   }
   response.headers = {"Cache": "no-cache", "Content-Type": "application/json"};
   response.statusCode = 200;
@@ -105,7 +105,7 @@ function processRequest(request, response) {
     console.log('received cmd:',cmdId, cmd.name);
     processCmd(cmd, response);
   } else {
-    response.write(JSON.stringify({status: 'cmdParseError'}));
+    response.write(JSON.stringify({status: 'cmdParseError', cmd: request.post}));
     response.close();
   }
 }
