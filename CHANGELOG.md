@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.0 (04.10.2017)
+
+* Improved PhantomJS not-started state handling.
+* Added logging PhantomJS response parsing error.
+* Added logging PhantomJS port.
+* Added logging original cmd when parsing error occurs.
+
 ## 1.8.0 (03.10.2017)
 
 * Added browserError event to handle JS errors of test pages.
