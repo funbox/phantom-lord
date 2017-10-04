@@ -26,15 +26,16 @@ class RemoteBrowser extends EventEmitter {
 
     debug('start remote server');
     this.server = spawn('./node_modules/phantomjs-prebuilt/bin/phantomjs', ['./node_modules/frontend-e2e-tests-env/browser-server.js', process.env.BROWSER_ARGS]);
+    this.pid = this.server.pid;
     this.server.stderr.on('data', (data) => {
       if (process.env.DEBUG || process.env.PHANTOM_OUTPUT) {
-        process.stdout.write(`phantom ${this.server.pid}: ${data.toString('utf8')}`);
+        process.stdout.write(`phantom ${this.pid}: ${data.toString('utf8')}`);
       }
     });
 
     this.server.stdout.on('data', (data) => {
       if (process.env.DEBUG || process.env.PHANTOM_OUTPUT) {
-        process.stdout.write(`phantom ${this.server.pid}: ${data.toString('utf8')}`);
+        process.stdout.write(`phantom ${this.pid}: ${data.toString('utf8')}`);
       }
 
       if (data.indexOf('Server started') > -1) {
@@ -42,29 +43,29 @@ class RemoteBrowser extends EventEmitter {
         this.state = 'started';
         this.stepInsertOffset = 1;
 
-        console.log(`phantom ${this.server.pid} port is ${this.port}, start processing steps`);
+        console.log(`phantom ${this.pid} port is ${this.port}, start processing steps`);
         this.processSteps();
       }
     });
 
-    debug(`server pid: ${this.server.pid}`);
+    debug(`server pid: ${this.pid}`);
 
     this.server.on('close', (code, signal) => {
-      debug(`server ${this.server.pid} closed with code: ${code}, signal: ${signal}`);
+      debug(`server ${this.pid} closed with code: ${code}, signal: ${signal}`);
       this.emit('exit', code, signal);
       this.state = 'notStarted';
       this.server = null;
     });
 
     this.server.on('exit', (code, signal) => {
-      debug(`server ${this.server.pid} exited with code: ${code}, signal: ${signal}`);
+      debug(`server ${this.pid} exited with code: ${code}, signal: ${signal}`);
       this.emit('exit', code, signal);
       this.state = 'notStarted';
       this.server = null;
     });
 
     this.server.on('phantomError', (err) => {
-      debug(`server ${this.server.pid} emitted an error: ${err}`);
+      debug(`server ${this.pid} emitted an error: ${err}`);
       this.state = 'error';
     });
 
@@ -267,7 +268,7 @@ class RemoteBrowser extends EventEmitter {
     const startWaitingTime = +new Date();
     return new Promise((resolve, reject) => {
       const notKilled = () => {
-        debug(`server ${this.server.pid} state: ${this.state}`);
+        debug(`server ${this.pid} state: ${this.state}`);
 
         const currentTime = +new Date();
         if (currentTime - startWaitingTime < this.WAIT_TIMEOUT) {
