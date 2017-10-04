@@ -427,7 +427,15 @@ class RemoteBrowser extends EventEmitter {
         debug(error);
         this.emit('phantomError', error);
       } else {
-        const jsonResp = JSON.parse(body);
+        let jsonResp;
+        try {
+          jsonResp = JSON.parse(body);
+        } catch(e) {
+          console.log(`Error while parsing body: ${body}`);
+          this.emit('phantomError', e);
+          return;
+        }
+
         if (jsonResp.browserErrors) {
           this.emit('browserErrors', jsonResp.browserErrors);
         }
