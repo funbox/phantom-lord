@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.13.0 (13.10.2017)
+
+* Added clickViaOther method.
+
 ## 1.12.0 (13.10.2017)
 
 * Improved stack trace logging when timeout fail occurs.
