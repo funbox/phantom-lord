@@ -232,6 +232,21 @@ class RemoteBrowser extends EventEmitter {
     });
   }
 
+  clickViaOther(selector, otherSelector) {
+    return this.then(() => {
+      return new Promise((resolve, reject) => {
+        this.sendCmd({name: 'clickViaOther', params: {selector, otherSelector}}, (resp) => {
+          if (resp.status == 'ok') {
+            resolve();
+          } else {
+            debug(`clickViaOther error: ${resp.status}`);
+            reject(`clickViaOther(${selector}, ${otherSelector})`);
+          }
+        });
+      });
+    });
+  }
+
   sendKeys(selector, keys, options) {
     this.click(selector);
     this._sendKeys(selector, keys, options);

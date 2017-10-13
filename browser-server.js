@@ -215,6 +215,32 @@ function processCmd(cmd, response) {
       respondWith({status: res});
     },
 
+    clickViaOther: function() {
+      var res = page.evaluate(function(sel, otherSel) {
+        var el = window.__utils__.findOne(sel);
+        if (!el) return 'notFound';
+
+        var otherEl = window.__utils__.findOne(otherSel);
+        if (!otherEl) return 'notFoundOther';
+
+        if (!__utils__.visible(sel)) return 'invisibleElement';
+        if (!__utils__.visible(otherSel)) return 'invisibleElementOther';
+
+        otherEl.focus();
+
+        var rect = el.getBoundingClientRect();
+        var x = (rect.left + rect.right) / 2;
+        var y = (rect.top + rect.bottom) / 2;
+
+        if (!__utils__.mouseEvent('mouseDown', otherSel, x, y)) return 'mouseDownError';
+        if (!__utils__.mouseEvent('mouseUp', otherSel, x, y)) return 'mouseUpError';
+        if (!__utils__.mouseEvent('click', otherSel, x, y)) return 'clickError';
+
+        return 'ok';
+      }, cmd.params.selector, cmd.params.otherSelector);
+      respondWith({status: res});
+    },
+
     sendKeys: function() {
       var selector = cmd.params.selector;
       var keys = cmd.params.keys;
