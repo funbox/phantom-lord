@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.12.0 (13.10.2017)
+
+* Improved stack trace logging when timeout fail occurs.
+
 ## 1.11.0 (04.10.2017)
 
 * Changed used ports range to prevent conflicts on CI.
