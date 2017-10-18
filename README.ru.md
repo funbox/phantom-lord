@@ -1,6 +1,6 @@
 # frontend-e2e-tests-env
 
-Библиотека, предоставляющая удобный интерфейс для взаимодействия с PhantomJS, вдохновлённая Casper.JS. В отличие от Casper.JS - управляющие инструкции выполняются в контексте Node.JS, а не Phantom.JS, что позволяет использовать ES2015 и более новые стандарты, а так же библиотеки, написанные для Node.JS. Phantom.JS может падать, поэтому выделение управляющей логики в отдельный процесс позволяет минимизировать ущерб от падения, а также перезапускать Phantom.JS настолько часто, насколько это необходимо. Библиотека может использоваться для автоматизированного тестирования, создания обходчиков сайтов и других задач, требующих наличия виртуального браузера.
+Библиотека, предоставляющая удобный интерфейс для взаимодействия с PhantomJS, вдохновлённая Casper.JS. В отличие от Casper.JS - управляющие инструкции выполняются в контексте Node.js, а не PhantomJS, что позволяет использовать ES2015 и более новые стандарты, а так же библиотеки, написанные для Node.js. PhantomJS может падать, поэтому выделение управляющей логики в отдельный процесс позволяет минимизировать ущерб от падения, а также перезапускать PhantomJS настолько часто, насколько это необходимо. Библиотека может использоваться для автоматизированного тестирования, создания обходчиков сайтов и других задач, требующих наличия виртуального браузера.
 
 *Внимание!* Библиотека использует порты 10100 - 10200 для запуска PhantomJS, поэтому данные порты должны быть свободны в системе.
 
@@ -141,3 +141,119 @@ console.log(`Текущее состояние: ${browser.state}`);
 ## Команды
 
 Для получения списка доступных команд см. файл index.js.
+
+## Моки
+
+TBD
+
+## Пример использования для тестирования
+
+Так как данная библиотека решает задачу общения с PhantomJS, Так как данная библиотека решает только задачу взаимодействия с PhantomJS, то для написания e2e тестов необходимо подключить дополнительные инструменты, например Mocha.js. Простейший код с использованием данного тестового фреймворка будет выглядеть так:
+
+```javascript
+let browser;
+let restartReason;
+let test;
+
+describe('Проверка yandex.ru', function() {
+  // Здесь не стрелочная функция, чтобы Mocha.js могла подменить контекст this
+  beforeEach(function() {
+    test = this.currentTest;
+    test.async = true; // Помечаем тест как асинхронный
+
+    browser = new Browser();
+
+    browser.on('timeout', (e) => {
+      console.log('e2e-tests timeout!');
+      test.callback(e); // В случае таймаута завершаем тест с ошибкой
+    });
+
+    browser.on('error', (e) => {
+      console.log('e2e-tests error!');
+      test.callback(new Error(e)); // В случае ошибки при выполнении шага завершаем тест с ошибкой
+    });
+
+    // Код отслеживания текущей ситуации с шагами
+    let stepsFinishedProcessed = false;
+    browser.on('stepsFinished', () => {
+      // Данная проверка нужна, чтобы исключить повторное событие завершения шагов (например, когда при падении теста - делается скриншот, который тоже является командой, приводящей к генерации события завершения шагов)
+      if (!stepsFinishedProcessed) {
+        stepsFinishedProcessed = true;
+        // Если все шаги завершились и не произошло никаких ошибко - значит тест завершился успешно
+        if (test.state !== 'failed') test.callback();
+      }
+    });
+
+    // В случае если в браузере возникла ошибка - завершаем тест. Для некоторых систем наличие ошибок в браузере - нормальная ситуация, но для большинства - нет.
+    browser.on('browserErrors', (e) => {
+      console.log('Ошибка браузера, тест провален');
+      test.callback(new Error(e[0].msg));
+    });
+
+    // Обработка ошибки PhantomJS
+    browser.on('phantomError', (e) => {
+      if (browser.testAlreadyFailed) {
+        console.log('Ошибка PhantomJS внутри afterEach, тест не перезапускаем');
+      } else {
+        console.log('Ошибка PhantomJS, перезапуск теста');
+        test.currentRetry(0);
+        test.retries(1);
+        restartReason = 'phantomError';
+        test.callback(new Error(e || 'Error'));
+      }
+    });
+
+    // Обработка падения PhantomJS
+    browser.on('exit', (code, signal) => {
+      if (browser.state === 'started' || browser.state === 'starting') {
+        console.log(`PhantomJS внезапно завершился code '${code}' signal '${signal}', перезапуск теста`);
+        test.currentRetry(0);
+        test.retries(1);
+        restartReason = 'exit';
+        test.callback(new Error('Unexpected PhantomJS exit'));
+      }
+    });
+  });
+
+  afterEach(function() {
+    const exit = () => browser.exit();
+
+    // Если тест завершился с ошибкой - делаем скриншот для удобства разбора падения
+    if (this.currentTest.state === 'failed') {
+      // В случае если падение теста произошло по вине падения PhantomJS - пытаться сделать скриншот бесполезно
+      if (browser.state !== 'started') {
+        console.log(`Не делаем скриншот, потому что browser.state = ${browser.state}`);
+        return undefined;
+      }
+      let t = this.currentTest;
+      const p = [];
+      while (t) {
+        p.unshift(t.title);
+        t = t.parent;
+      }
+
+      const pad = (x) => (x < 10 ? '0' : '') + x;
+      const time = new Date(parseInt(process.env.E2E_TESTS_START_TIMESTAMP, 10));
+      p.unshift(`${time.getFullYear()}_${pad((time.getMonth() + 1))}_${pad(time.getDate())}_${pad(time.getHours())}_${pad(time.getMinutes())}_${pad(time.getSeconds())}`);
+
+      p.unshift('screenshots');
+      const fname = `${p.join('/')}.png`;
+      browser.testAlreadyFailed = true;
+
+      // Не важно как завершилась команда получения скриншота - после нее нужно в любом случае завершить работу браузера, иначе останется зомби-процесс
+      return browser.capture(fname).then(exit, exit);
+    }
+
+    return exit();
+  });
+
+  it('тест поиска', () => {
+    browser.open('https://ya.ru');
+    browser.waitForText('Найти');
+    browser.sendKeys('.input__input', 'hello');
+    browser.click('button');
+    browser.waitForUrl('yandex.ru');
+    browser.waitForText('показов в месяц'); // Если мы не дождемся данной надписи - то тест провалится
+  });
+});
+```
