@@ -54,10 +54,10 @@ page.onInitialized = function onInitialized() {
     }, testSettings);
   if (stubsQueue.length > 0) {
     page.evaluate(function(stubs) {
-      window.mocks = [];
+      window.stubs = [];
       for(var i = 0; i < stubs.length; i++) {
         var stub = stubs[i];
-        window.mocks.push({ method: stub.method, url: stub.url, data: stub.data });
+        window.stubs.push({ method: stub.method, url: stub.url, data: stub.data });
       }
     }, stubsQueue)
   }
@@ -296,8 +296,8 @@ function processCmd(cmd, response) {
       var stub = cmd.params.stub;
       if (isInitialized) {
         page.evaluate(function(method, url, data) {
-          window.mocks = window.mocks || [];
-          window.mocks.push({ method: method, url: url, data: data });
+          window.stubs = window.stubs || [];
+          window.stubs.push({ method: method, url: url, data: data });
         }, stub.method, stub.url, stub.data);
       } else {
         stubsQueue.push(stub);

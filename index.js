@@ -518,9 +518,9 @@ class RemoteBrowser extends EventEmitter {
     });
   }
 
-  getCurrentMocks() {
+  getCurrentStubs() {
     this.evaluate(function(){
-      return window.mocks;
+      return window.stubs;
     });
   }
 
