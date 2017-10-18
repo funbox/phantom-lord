@@ -141,7 +141,7 @@ class RemoteBrowser extends EventEmitter {
   }
 
   waitUntilVisible(selector, onTimeout) {
-    return this.waitFor(() => this.checkVisibility(selector), onTimeout);
+    return this.waitFor(() => this.checkInvisibility(selector), onTimeout);
   }
 
   waitStart() {
@@ -433,6 +433,18 @@ class RemoteBrowser extends EventEmitter {
           resolve();
         } else {
           reject(`Expected selector '${selector}' is not visible`);
+        }
+      });
+    });
+  }
+
+  checkInvisibility(selector) {
+    return new Promise((resolve, reject) => {
+      this.sendCmd({name: 'checkVisibility', params: {selector}}, (resp) => {
+        if (resp.status !== 'ok') {
+          resolve();
+        } else {
+          reject(`Error: Expected selector '${selector}' is visible`);
         }
       });
     });
