@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.14.0 (18.10.2017)
+
+* Fixed waitUntilVisible.
+
 ## 1.13.0 (13.10.2017)
 
 * Added clickViaOther method.
