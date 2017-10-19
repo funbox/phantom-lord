@@ -167,7 +167,7 @@ class RemoteBrowser extends EventEmitter {
   waitFor(fn, onTimeout) {
     const errorWithUsefulStack = new Error();
     const startWaitingTime = +new Date();
-    if (process.env.E2E_TESTS_WITH_PAUSES === 'true') {
+    if (process.env.E2E_TESTS_WITH_PAUSES) {
       this.CHECK_INTERVAL += 300;
     }
     return this.then(() => {
