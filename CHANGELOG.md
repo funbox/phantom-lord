@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.15.0 (19.10.2017)
+
+* Renamed `window.mocks` to `window.stubs`.
+
 ## 1.14.0 (18.10.2017)
 
 * Fixed waitUntilVisible.
