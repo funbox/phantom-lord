@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.16.0 (31.10.2017)
+
+* Improved the docs.
+
 ## 1.15.0 (19.10.2017)
 
 * Renamed `window.mocks` to `window.stubs`.
