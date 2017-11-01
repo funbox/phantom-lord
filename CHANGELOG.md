@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0 (01.11.2017)
+
+* Renamed the package to `funbox-phantom-lord`.
+
 ## 1.16.0 (31.10.2017)
 
 * Improved the docs.
