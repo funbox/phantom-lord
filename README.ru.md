@@ -1,8 +1,8 @@
-# frontend-e2e-tests-env
+# funbox-phantom-lord
 
 ## Описание библиотеки
 
-**frontend-e2e-tests-env** — это библиотека, предоставляющая удобный интерфейс для взаимодействия с [PhantomJS](http://phantomjs.org/), вдохновлённая [CasperJS](http://casperjs.org/).
+**funbox-phantom-lord** — это библиотека, предоставляющая удобный интерфейс для взаимодействия с [PhantomJS](http://phantomjs.org/), вдохновлённая [CasperJS](http://casperjs.org/).
 
 Библиотека может использоваться для автоматизированного тестирования, создания обходчиков сайтов и других задач, требующих наличия виртуального браузера.
 
@@ -161,7 +161,7 @@ console.log(`Текущее состояние: ${browser.state}`);
 Подключение библиотеки:
 
 ```javascript
-const Browser = require('frontend-e2e-tests-env');
+const Browser = require('funbox-phantom-lord');
 ```
 
 Запуск сервера и настройка вывода ошибок:

@@ -25,7 +25,7 @@ class RemoteBrowser extends EventEmitter {
     this.state = 'starting';
 
     debug('start remote server');
-    this.server = spawn('./node_modules/phantomjs-prebuilt/bin/phantomjs', ['./node_modules/frontend-e2e-tests-env/browser-server.js', process.env.BROWSER_ARGS]);
+    this.server = spawn('./node_modules/phantomjs-prebuilt/bin/phantomjs', ['./node_modules/funbox-phantom-lord/browser-server.js', process.env.BROWSER_ARGS]);
     this.pid = this.server.pid;
     this.server.stderr.on('data', (data) => {
       if (process.env.DEBUG || process.env.PHANTOM_OUTPUT) {

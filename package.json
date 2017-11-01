@@ -1,5 +1,5 @@
 {
-  "name": "frontend-e2e-tests-env",
+  "name": "funbox-phantom-lord",
   "version": "1.16.0",
   "description": "Библиотека для связи Node.js и PhantomJS",
   "main": "index.js",
