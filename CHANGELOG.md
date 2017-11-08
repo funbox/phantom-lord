@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0 (08.11.2017)
+
+* Added note about `devtool` param to README.
+
 ## 2.0.0 (01.11.2017)
 
 * Renamed the package to `funbox-phantom-lord`.
