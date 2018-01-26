@@ -490,6 +490,20 @@ class RemoteBrowser extends EventEmitter {
     });
   }
 
+  addCookieToQueue(cookie) {
+    return this.then(() => {
+      return new Promise((resolve, reject) => {
+        this.sendCmd({ name: 'addCookieToQueue', params: { cookie } }, (resp) => {
+          if (resp.status === 'ok') {
+            resolve();
+          } else {
+            reject(`addCookieToQueue(${cookie.name} ${cookie.value})`);
+          }
+        });
+      });
+    });
+  }
+
   addStubToQueue(stub) {
     return this.then(() => {
       return new Promise((resolve, reject) => {

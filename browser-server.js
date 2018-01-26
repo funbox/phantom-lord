@@ -19,6 +19,7 @@ var height = browserArgs.viewportHeight || 900;
 
 page.viewportSize = {width: width, height: height};
 var stubsQueue = [];
+var cookiesQueue = [];
 var testSettings = {};
 var isInitialized = false;
 cmdId = 0;
@@ -62,6 +63,13 @@ page.onInitialized = function onInitialized() {
     }, stubsQueue)
   }
 
+  if (cookiesQueue.length > 0) {
+    page.evaluate(function(cookie) {
+      for (var i = 0; i < cookie.length; i++) {
+        document.cookie = [cookie[i].name, cookie[i].value].join('=');
+      }
+    }, cookiesQueue)
+  }
 };
 // Включение вывода console.log с сайта
 page.onConsoleMessage = function(msg, lineNum, sourceId) {
@@ -290,6 +298,18 @@ function processCmd(cmd, response) {
       var filename = fs.absolute(fname);
       page.render(filename);
       respondWith({status: 'ok'});
+    },
+
+    addCookieToQueue: function() {
+      var cookie = cmd.params.cookie;
+      if (isInitialized) {
+        page.evaluate(function(name, value) {
+          document.cookie = [name, value].join('=');
+        }, cookie.name, cookie.value);
+      } else {
+        cookiesQueue.push(cookie);
+      }
+      respondWith({ status: 'ok' });
     },
 
     addStubToQueue: function() {
