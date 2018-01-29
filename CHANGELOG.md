@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0 (29.01.2018)
+
+* Added `addCookieToQueue`.
+
 ## 2.1.0 (08.11.2017)
 
 * Added note about `devtool` param to README.
