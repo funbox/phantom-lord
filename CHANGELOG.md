@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.0 (06.02.2018)
+
+* Made path to `localStorage` unique.
+
 ## 2.2.0 (29.01.2018)
 
 * Added `addCookieToQueue`.
