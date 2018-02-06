@@ -11,6 +11,8 @@
     "chai": "3.5.0",
     "expect": "1.20.2",
     "mocha": "3.2.0",
-    "phantomjs-prebuilt": "2.1.14-fb-1.0.0"
+    "phantomjs-prebuilt": "2.1.14-fb-1.0.0",
+    "rimraf": "2.6.2",
+    "uuid": "3.2.1"
   }
 }

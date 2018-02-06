@@ -2,9 +2,13 @@ const spawn = require('child_process').spawn;
 const request = require('request');
 const EventEmitter = require('events').EventEmitter;
 const utils = require('./utils.js');
+const path = require('path');
+const uuidv4 = require('uuid/v4');
+const rimraf = require('rimraf');
 RegExp.prototype.toJSON = function() { return 're:' + this.source; }; // для сохранения regexp в моках
 const f = utils.format;
 var browserArgs = JSON.parse(process.env.BROWSER_ARGS || '{}');
+const localStorageBaseDir = path.resolve('node_modules/.funbox-phantom-lord-local-storage');
 
 function debug(str) {
   if (process.env.DEBUG) {
@@ -20,12 +24,14 @@ class RemoteBrowser extends EventEmitter {
     this.stepInsertOffset = 1;
     this.steps = [];
   }
+
   startRemoteBrowser() {
     if (this.state != 'notStarted') return;
     this.state = 'starting';
 
     debug('start remote server');
-    this.server = spawn('./node_modules/phantomjs-prebuilt/bin/phantomjs', ['./node_modules/funbox-phantom-lord/browser-server.js', process.env.BROWSER_ARGS]);
+    const localStoragePath = path.resolve(localStorageBaseDir, uuidv4());
+    this.server = spawn('./node_modules/phantomjs-prebuilt/bin/phantomjs', [`--local-storage-path=${localStoragePath}`, './node_modules/funbox-phantom-lord/browser-server.js', process.env.BROWSER_ARGS]);
     this.pid = this.server.pid;
     this.server.stderr.on('data', (data) => {
       if (process.env.DEBUG || process.env.PHANTOM_OUTPUT) {
@@ -641,5 +647,9 @@ class RemoteBrowser extends EventEmitter {
 
 RemoteBrowser.prototype.WAIT_TIMEOUT = browserArgs.waitTimeout || 30000;
 RemoteBrowser.prototype.CHECK_INTERVAL = 50;
+
+RemoteBrowser.deleteLocalStorageBaseDir = function() {
+  rimraf.sync(localStorageBaseDir);
+};
 
 module.exports = RemoteBrowser;
