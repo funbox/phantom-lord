@@ -5,6 +5,7 @@ const utils = require('./utils.js');
 const path = require('path');
 const uuidv4 = require('uuid/v4');
 const rimraf = require('rimraf');
+const phantomjs = require('phantomjs-prebuilt');
 RegExp.prototype.toJSON = function() { return 're:' + this.source; }; // для сохранения regexp в моках
 const f = utils.format;
 var browserArgs = JSON.parse(process.env.BROWSER_ARGS || '{}');
@@ -31,8 +32,10 @@ class RemoteBrowser extends EventEmitter {
 
     debug('start remote server');
     const localStoragePath = path.resolve(localStorageBaseDir, uuidv4());
-    this.server = spawn('./node_modules/phantomjs-prebuilt/bin/phantomjs', [`--local-storage-path=${localStoragePath}`, './node_modules/funbox-phantom-lord/browser-server.js', process.env.BROWSER_ARGS]);
+    const pathToPhantom = process.platform === 'win32' ? phantomjs.path : './node_modules/phantomjs-prebuilt/bin/phantomjs';
+    this.server = spawn(pathToPhantom, [`--local-storage-path=${localStoragePath}`, './node_modules/funbox-phantom-lord/browser-server.js', process.env.BROWSER_ARGS]);
     this.pid = this.server.pid;
+    process.stdin.pipe(this.server);
     this.server.stderr.on('data', (data) => {
       if (process.env.DEBUG || process.env.PHANTOM_OUTPUT) {
         process.stdout.write(`phantom ${this.pid}: ${data.toString('utf8')}`);
@@ -74,6 +77,12 @@ class RemoteBrowser extends EventEmitter {
       debug(`server ${this.pid} emitted an error: ${err}`);
       this.state = 'error';
     });
+
+    this.server.on('SIGTERM', function() {
+      console(`server ${this.pid} killed with code: ${code}, signal: SIGTERM`)
+      this.server.kill('SIGTERM')
+      process.exit(1)
+    })
 
     // TODO: Добавить отлуп каспера по таймауту
   }
