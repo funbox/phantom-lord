@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.0 (02.03.2018)
+
+* Added `addLocalStorageItemToQueue`.
+
 ## 2.3.0 (06.02.2018)
 
 * Made path to `localStorage` unique.
