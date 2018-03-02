@@ -510,6 +510,20 @@ class RemoteBrowser extends EventEmitter {
     });
   }
 
+  addLocalStorageItemToQueue(item) {
+    return this.then(() => {
+      return new Promise((resolve, reject) => {
+        this.sendCmd({ name: 'addLocalStorageItemToQueue', params: { item } }, (resp) => {
+          if (resp.status === 'ok') {
+            resolve();
+          } else {
+            reject(`addLocalStorageItemToQueue(${item.key} ${item.value})`);
+          }
+        });
+      });
+    });
+  }
+
   addStubToQueue(stub) {
     return this.then(() => {
       return new Promise((resolve, reject) => {

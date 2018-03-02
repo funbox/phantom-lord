@@ -20,6 +20,7 @@ var height = browserArgs.viewportHeight || 900;
 page.viewportSize = {width: width, height: height};
 var stubsQueue = [];
 var cookiesQueue = [];
+var localStorageItemsQueue = [];
 var testSettings = {};
 var isInitialized = false;
 cmdId = 0;
@@ -69,6 +70,14 @@ page.onInitialized = function onInitialized() {
         document.cookie = [cookie[i].name, cookie[i].value].join('=');
       }
     }, cookiesQueue)
+  }
+
+  if (localStorageItemsQueue.length > 0) {
+    page.evaluate(function(items) {
+      for (var i = 0; i < items.length; i++) {
+        localStorage.setItem(items[i].key, items[i].value);
+      }
+    }, localStorageItemsQueue)
   }
 };
 // Включение вывода console.log с сайта
@@ -312,6 +321,18 @@ function processCmd(cmd, response) {
       respondWith({ status: 'ok' });
     },
 
+    addLocalStorageItemToQueue: function() {
+      var item = cmd.params.item;
+      if (isInitialized) {
+        page.evaluate(function(key, value) {
+          localStorage.setItem(key, value);
+        }, item.key, item.value);
+      } else {
+        localStorageItemsQueue.push(item);
+      }
+      respondWith({ status: 'ok' });
+    },
+
     addStubToQueue: function() {
       var stub = cmd.params.stub;
       if (isInitialized) {
@@ -343,7 +364,7 @@ function processCmd(cmd, response) {
 
     fillForm: function() {
       var selector = cmd.params.selector;
-      var vals = cmd.params.vals; 
+      var vals = cmd.params.vals;
       var options = cmd.params.options;
       var selectorType = options && options.selectorType || "names",
         submit = !!(options && options.submit);
