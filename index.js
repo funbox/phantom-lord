@@ -6,14 +6,16 @@ const path = require('path');
 const uuidv4 = require('uuid/v4');
 const rimraf = require('rimraf');
 const phantomjs = require('phantomjs-prebuilt');
-RegExp.prototype.toJSON = function() { return 're:' + this.source; }; // для сохранения regexp в моках
+
+// eslint-disable-next-line no-extend-native
+RegExp.prototype.toJSON = () => `re:${this.source}`; // для сохранения regexp в моках
 const f = utils.format;
-var browserArgs = JSON.parse(process.env.BROWSER_ARGS || '{}');
+const browserArgs = JSON.parse(process.env.BROWSER_ARGS || '{}');
 const localStorageBaseDir = path.resolve('node_modules/.funbox-phantom-lord-local-storage');
 
 function debug(str) {
   if (process.env.DEBUG) {
-    console.log(`debug: ` + str);
+    console.log(`debug: ${str}`);
   }
 }
 
@@ -27,7 +29,7 @@ class RemoteBrowser extends EventEmitter {
   }
 
   startRemoteBrowser() {
-    if (this.state != 'notStarted') return;
+    if (this.state !== 'notStarted') return;
     this.state = 'starting';
 
     debug('start remote server');
@@ -78,41 +80,31 @@ class RemoteBrowser extends EventEmitter {
       this.state = 'error';
     });
 
-    this.server.on('SIGTERM', function() {
-      console(`server ${this.pid} killed with code: ${code}, signal: SIGTERM`)
-      this.server.kill('SIGTERM')
-      process.exit(1)
-    })
-
     // TODO: Добавить отлуп каспера по таймауту
   }
 
   open(url) {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.sendCmd({name: 'open', params: {url}}, (resp) => {
-          if (resp.status == 'ok') {
-            resolve();
-          } else {
-            reject(`open page error: ${resp.status}`);
-          }
-        });
+    return this.then(() => new Promise((resolve, reject) => {
+      this.sendCmd({ name: 'open', params: { url } }, (resp) => {
+        if (resp.status === 'ok') {
+          resolve();
+        } else {
+          reject(`open page error: ${resp.status}`);
+        }
       });
-    });
+    }));
   }
 
   waitForText(text, onTimeout) {
-    return this.waitFor(() => {
-      return new Promise((resolve, reject) => {
-        this.getPlainText().then((pageText) => {
-          if (pageText.indexOf(text) > -1) {
-            resolve();
-          } else {
-            reject(`waitForText('${text}')`);
-          }
-        });
-      })
-    }, onTimeout);
+    return this.waitFor(() => new Promise((resolve, reject) => {
+      this.getPlainText().then((pageText) => {
+        if (pageText.indexOf(text) > -1) {
+          resolve();
+        } else {
+          reject(`waitForText('${text}')`);
+        }
+      });
+    }), onTimeout);
   }
 
   waitForSelector(selector, onTimeout) {
@@ -124,31 +116,27 @@ class RemoteBrowser extends EventEmitter {
   }
 
   waitWhileText(text, onTimeout) {
-    return this.waitFor(() => {
-      return new Promise((resolve, reject) => {
-        this.getPlainText().then((pageText) => {
-          if (pageText.indexOf(text) == -1) {
-            resolve();
-          } else {
-            reject(`waitWhileText('${text}')`);
-          }
-        })
-      })
-    }, onTimeout)
+    return this.waitFor(() => new Promise((resolve, reject) => {
+      this.getPlainText().then((pageText) => {
+        if (pageText.indexOf(text) === -1) {
+          resolve();
+        } else {
+          reject(`waitWhileText('${text}')`);
+        }
+      });
+    }), onTimeout);
   }
 
   waitForUrl(url, onTimeout) {
-    return this.waitFor(() => {
-      return new Promise((resolve, reject) => {
-        this.getCurrentUrl().then((currentUrl) => {
-          if (url.exec && url.exec(currentUrl) || currentUrl.indexOf(url) !== -1) {
-            resolve();
-          } else {
-            reject(`waitForUrl('${url}')`);
-          }
-        });
+    return this.waitFor(() => new Promise((resolve, reject) => {
+      this.getCurrentUrl().then((currentUrl) => {
+        if ((url.exec && url.exec(currentUrl)) || currentUrl.indexOf(url) !== -1) {
+          resolve();
+        } else {
+          reject(`waitForUrl('${url}')`);
+        }
       });
-    }, onTimeout);
+    }), onTimeout);
   }
 
   waitWhileVisible(selector, onTimeout) {
@@ -167,16 +155,14 @@ class RemoteBrowser extends EventEmitter {
     this.pendingWait = false;
   }
 
-  wait(timeout, then) {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.waitStart();
-        setTimeout((self) => {
-          self.waitDone();
-          resolve();
-        }, timeout, this)
-      })
-    })
+  wait(timeout) {
+    return this.then(() => new Promise((resolve) => {
+      this.waitStart();
+      setTimeout((self) => {
+        self.waitDone();
+        resolve();
+      }, timeout, this);
+    }));
   }
 
   waitFor(fn, onTimeout) {
@@ -185,108 +171,97 @@ class RemoteBrowser extends EventEmitter {
     if (process.env.E2E_TESTS_WITH_PAUSES) {
       this.CHECK_INTERVAL += 300;
     }
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        const condNotSatisfied = (error) => {
-          const currentTime = +new Date();
+    return this.then(() => new Promise((resolve, reject) => {
+      const self = this;
+      function condNotSatisfied(error) {
+        const currentTime = +new Date();
 
-          if (currentTime - startWaitingTime < this.WAIT_TIMEOUT) {
-            setTimeout(() => waiter(), this.CHECK_INTERVAL);
-          } else {
-            onTimeout && onTimeout();
-            errorWithUsefulStack.message = error;
-            reject({type: 'timeout', data: errorWithUsefulStack});
-          }
+        if (currentTime - startWaitingTime < self.WAIT_TIMEOUT) {
+          setTimeout(() => waiter(), self.CHECK_INTERVAL);
+        } else {
+          if (onTimeout) onTimeout();
+          errorWithUsefulStack.message = error;
+          reject({ type: 'timeout', data: errorWithUsefulStack });
         }
+      }
 
-        const waiter = () => {
-          // TODO: Добавить try/catch
-          const res = fn();
-          if (res && res.then) {
-            res.then(() => {
-              resolve();
-            }, (error) => {
-              condNotSatisfied(error);
-            });
-          } else {
-            if (res) {
-              resolve();
-            } else {
-              condNotSatisfied();
-            }
-          }
+      function waiter() {
+        // TODO: Добавить try/catch
+        const res = fn();
+        if (res && res.then) {
+          res.then(() => {
+            resolve();
+          }, (error) => {
+            condNotSatisfied(error);
+          });
+        } else if (res) {
+          resolve();
+        } else {
+          condNotSatisfied();
         }
+      }
 
-        waiter();
-      });
-    });
+      waiter();
+    }));
   }
 
   evaluate(fn, ...args) {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.sendCmd({name: 'evaluate', params: {fn: fn.toString(), args}}, (resp) => {
-          resolve(resp.result);
-        });
+    return this.then(() => new Promise((resolve) => {
+      this.sendCmd({ name: 'evaluate', params: { fn: fn.toString(), args } }, (resp) => {
+        resolve(resp.result);
       });
-    });
+    }));
   }
 
   click(selector, x, y) {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.sendCmd({name: 'click', params: {selector, x, y}}, (resp) => {
-          if (resp.status == 'ok') {
-            resolve();
-          } else {
-            debug(`click error: ${resp.status}`);
-            reject(`click(${selector})`);
-          }
-        });
+    return this.then(() => new Promise((resolve, reject) => {
+      this.sendCmd({ name: 'click', params: { selector, x, y } }, (resp) => {
+        if (resp.status === 'ok') {
+          resolve();
+        } else {
+          debug(`click error: ${resp.status}`);
+          reject(`click(${selector})`);
+        }
       });
-    });
+    }));
   }
 
   clickViaOther(selector, otherSelector) {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.sendCmd({name: 'clickViaOther', params: {selector, otherSelector}}, (resp) => {
-          if (resp.status == 'ok') {
-            resolve();
-          } else {
-            debug(`clickViaOther error: ${resp.status}`);
-            reject(`clickViaOther(${selector}, ${otherSelector})`);
-          }
-        });
+    return this.then(() => new Promise((resolve, reject) => {
+      this.sendCmd({ name: 'clickViaOther', params: { selector, otherSelector } }, (resp) => {
+        if (resp.status === 'ok') {
+          resolve();
+        } else {
+          debug(`clickViaOther error: ${resp.status}`);
+          reject(`clickViaOther(${selector}, ${otherSelector})`);
+        }
       });
-    });
+    }));
   }
 
   sendKeys(selector, keys, options) {
     this.click(selector);
-    this._sendKeys(selector, keys, options);
+    this._sendKeys(selector, keys, options); // eslint-disable-line no-underscore-dangle
   }
 
   clickLabel(label, tag) {
-    tag = tag || "*";
-    var escapedLabel = utils.quoteXPathAttributeString(label);
-    var selector = this.xpath(f('//%s[text()=%s]', tag, escapedLabel));
+    tag = tag || '*';
+    const escapedLabel = utils.quoteXPathAttributeString(label);
+    const selector = this.xpath(f('//%s[text()=%s]', tag, escapedLabel));
     return this.click(selector);
   }
 
   _sendKeys(selector, keys, options) {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.sendCmd({name: 'sendKeys', params: {selector, keys, options}}, (resp) => {
-          if (resp.status == 'ok') {
-            resolve();
-          } else {
-            debug(`click error: ${resp.status}`);
-            reject(`sendKeys(${selector}, ${keys}, ${options})`);
-          }
-        });
+    return this.then(() => new Promise((resolve, reject) => {
+      this.sendCmd({ name: 'sendKeys', params: { selector, keys, options } }, (resp) => {
+        if (resp.status === 'ok') {
+          resolve();
+        } else {
+          debug(`click error: ${resp.status}`);
+          reject(`sendKeys(${selector}, ${keys}, ${options})`);
+        }
       });
-    });
+    }));
   }
 
   exit() {
@@ -299,22 +274,23 @@ class RemoteBrowser extends EventEmitter {
 
     const startWaitingTime = +new Date();
     return new Promise((resolve, reject) => {
-      const notKilled = () => {
-        debug(`server ${this.pid} state: ${this.state}`);
+      const self = this;
+      function notKilled() {
+        debug(`server ${self.pid} state: ${self.state}`);
 
         const currentTime = +new Date();
-        if (currentTime - startWaitingTime < this.WAIT_TIMEOUT) {
-          setTimeout(() => waiter(), this.CHECK_INTERVAL);
+        if (currentTime - startWaitingTime < self.WAIT_TIMEOUT) {
+          setTimeout(() => waiter(), self.CHECK_INTERVAL);
         } else {
           reject();
         }
-      };
+      }
 
-      const waiter = () => {
-        if (this.state === 'notStarted') {
+      function waiter() {
+        if (self.state === 'notStarted') {
           resolve();
         } else notKilled();
-      };
+      }
 
       this.server.kill();
       waiter();
@@ -324,18 +300,18 @@ class RemoteBrowser extends EventEmitter {
   then(fn) {
     debug(`currentStep: ${this.currentStep}, stepInsertOffset: ${this.stepInsertOffset}, stepsCount: ${this.steps.length}`);
     this.steps.splice(this.currentStep + this.stepInsertOffset, 0, fn);
-    this.stepInsertOffset++;
+    this.stepInsertOffset += 1;
     this.processSteps();
     return this;
   }
 
   processSteps(lastRes) {
-    if (this.state == 'notStarted') {
+    if (this.state === 'notStarted') {
       this.startRemoteBrowser();
       return;
     }
 
-    if (this.state != 'started' || this.processing) return;
+    if (this.state !== 'started' || this.processing) return;
 
     if (this.currentStep >= this.steps.length) {
       this.emit('stepsFinished');
@@ -349,7 +325,7 @@ class RemoteBrowser extends EventEmitter {
     try {
       const stepRes = step(lastRes);
       const processNext = (curRes) => {
-        this.currentStep++;
+        this.currentStep += 1;
         this.stepInsertOffset = 1;
         this.processing = false;
         this.processSteps(curRes);
@@ -360,7 +336,7 @@ class RemoteBrowser extends EventEmitter {
           debug(`processing step ${this.currentStep} of ${this.steps.length} failed`);
 
           if (e && e.type) {
-            if (e.type == 'timeout') {
+            if (e.type === 'timeout') {
               this.emit('timeout', e.data);
             } else {
               this.emit('error', e.data);
@@ -378,16 +354,16 @@ class RemoteBrowser extends EventEmitter {
   }
 
   getPlainText() {
-    return new Promise((resolve, reject) => {
-      this.sendCmd({name: 'getPlainText'}, (resp) => {
+    return new Promise((resolve) => {
+      this.sendCmd({ name: 'getPlainText' }, (resp) => {
         resolve(resp.result);
       });
     });
   }
 
   getCurrentUrl() {
-    return new Promise((resolve, reject) => {
-      this.sendCmd({name: 'getCurrentUrl'}, (resp) => {
+    return new Promise((resolve) => {
+      this.sendCmd({ name: 'getCurrentUrl' }, (resp) => {
         resolve(resp.result);
       });
     });
@@ -395,8 +371,8 @@ class RemoteBrowser extends EventEmitter {
 
   checkSelectorExists(selector) {
     return new Promise((resolve, reject) => {
-      this.sendCmd({name: 'checkSelectorExists', params: {selector}}, (resp) => {
-        if (resp.status == 'ok') {
+      this.sendCmd({ name: 'checkSelectorExists', params: { selector } }, (resp) => {
+        if (resp.status === 'ok') {
           resolve();
         } else {
           reject(`Expected selector '${selector}' do not exist`);
@@ -407,8 +383,8 @@ class RemoteBrowser extends EventEmitter {
 
   checkSelectorNotExists(selector) {
     return new Promise((resolve, reject) => {
-      this.sendCmd({name: 'checkSelectorExists', params: {selector}}, (resp) => {
-        if (resp.status == 'notFound') {
+      this.sendCmd({ name: 'checkSelectorExists', params: { selector } }, (resp) => {
+        if (resp.status === 'notFound') {
           resolve();
         } else {
           reject(`Expected selector '${selector}' exists`);
@@ -419,8 +395,8 @@ class RemoteBrowser extends EventEmitter {
 
   checkSelectorText(selector, text, exactMatch = false) {
     return new Promise((resolve, reject) => {
-      this.sendCmd({name: 'checkSelectorText', params: {selector, text, exactMatch}}, (resp) => {
-        if (resp.status == 'ok') {
+      this.sendCmd({ name: 'checkSelectorText', params: { selector, text, exactMatch } }, (resp) => {
+        if (resp.status === 'ok') {
           resolve();
         } else {
           reject(`Expected text of '${selector}' to be '${text}', but it was '${resp.text}'`);
@@ -431,8 +407,8 @@ class RemoteBrowser extends EventEmitter {
 
   checkSelectorValue(selector, value) {
     return new Promise((resolve, reject) => {
-      this.sendCmd({name: 'checkSelectorValue', params: {selector, value}}, (resp) => {
-        if (resp.status == 'ok') {
+      this.sendCmd({ name: 'checkSelectorValue', params: { selector, value } }, (resp) => {
+        if (resp.status === 'ok') {
           resolve();
         } else {
           reject(`Expected value of '${selector}' to be '${value}', but it was '${resp.value}'`);
@@ -443,8 +419,8 @@ class RemoteBrowser extends EventEmitter {
 
   checkVisibility(selector) {
     return new Promise((resolve, reject) => {
-      this.sendCmd({name: 'checkVisibility', params: {selector}}, (resp) => {
-        if (resp.status == 'ok') {
+      this.sendCmd({ name: 'checkVisibility', params: { selector } }, (resp) => {
+        if (resp.status === 'ok') {
           resolve();
         } else {
           reject(`Expected selector '${selector}' is not visible`);
@@ -455,7 +431,7 @@ class RemoteBrowser extends EventEmitter {
 
   checkInvisibility(selector) {
     return new Promise((resolve, reject) => {
-      this.sendCmd({name: 'checkVisibility', params: {selector}}, (resp) => {
+      this.sendCmd({ name: 'checkVisibility', params: { selector } }, (resp) => {
         if (resp.status !== 'ok') {
           resolve();
         } else {
@@ -471,26 +447,26 @@ class RemoteBrowser extends EventEmitter {
 
     if (this.state !== 'started') {
       console.log(`Can't process cmd because server state = ${this.state}`);
-      cb({status: 'notStarted'});
+      cb({ status: 'notStarted' });
       return;
     }
 
     request.post({
       method: 'POST',
-      url: 'http://localhost:' + this.port,
+      url: `http://localhost:${this.port}`,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(cmd)
+      body: JSON.stringify(cmd),
     }, (error, response, body) => {
       // debug(`response received: ${body}`);
       if (error) {
-        const error = `Error while processing cmd: ${JSON.stringify(cmd)}`;
-        debug(error);
-        this.emit('phantomError', error);
+        const errorText = `Error while processing cmd: ${JSON.stringify(cmd)}`;
+        debug(errorText);
+        this.emit('phantomError', errorText);
       } else {
         let jsonResp;
         try {
           jsonResp = JSON.parse(body);
-        } catch(e) {
+        } catch (e) {
           console.log(`Error while parsing body: ${body}`);
           this.emit('phantomError', e);
           return;
@@ -506,71 +482,64 @@ class RemoteBrowser extends EventEmitter {
   }
 
   addCookieToQueue(cookie) {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.sendCmd({ name: 'addCookieToQueue', params: { cookie } }, (resp) => {
-          if (resp.status === 'ok') {
-            resolve();
-          } else {
-            reject(`addCookieToQueue(${cookie.name} ${cookie.value})`);
-          }
-        });
+    return this.then(() => new Promise((resolve, reject) => {
+      this.sendCmd({ name: 'addCookieToQueue', params: { cookie } }, (resp) => {
+        if (resp.status === 'ok') {
+          resolve();
+        } else {
+          reject(`addCookieToQueue(${cookie.name} ${cookie.value})`);
+        }
       });
-    });
+    }));
   }
 
   addLocalStorageItemToQueue(item) {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.sendCmd({ name: 'addLocalStorageItemToQueue', params: { item } }, (resp) => {
-          if (resp.status === 'ok') {
-            resolve();
-          } else {
-            reject(`addLocalStorageItemToQueue(${item.key} ${item.value})`);
-          }
-        });
+    return this.then(() => new Promise((resolve, reject) => {
+      this.sendCmd({ name: 'addLocalStorageItemToQueue', params: { item } }, (resp) => {
+        if (resp.status === 'ok') {
+          resolve();
+        } else {
+          reject(`addLocalStorageItemToQueue(${item.key} ${item.value})`);
+        }
       });
-    });
+    }));
   }
 
   addStubToQueue(stub) {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.sendCmd({name: 'addStubToQueue', params: {stub}}, (resp) => {
-          if (resp.status == 'ok') {
-            resolve();
-          } else {
-            reject(`addStubToQueue(${stub.method} ${stub.url})`);
-          }
-        });
+    return this.then(() => new Promise((resolve, reject) => {
+      this.sendCmd({ name: 'addStubToQueue', params: { stub } }, (resp) => {
+        if (resp.status === 'ok') {
+          resolve();
+        } else {
+          reject(`addStubToQueue(${stub.method} ${stub.url})`);
+        }
       });
-    });
+    }));
   }
 
   addTestSetting(setting, value) {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.sendCmd({name: 'addTestSetting', params: {setting, value}}, (resp) => {
-          if (resp.status == 'ok') {
-            resolve();
-          } else {
-            reject(`addTestSetting(${setting}, ${stub.value})`);
-          }
-        });
+    return this.then(() => new Promise((resolve, reject) => {
+      this.sendCmd({ name: 'addTestSetting', params: { setting, value } }, (resp) => {
+        if (resp.status === 'ok') {
+          resolve();
+        } else {
+          reject(`addTestSetting(${setting}, ${value})`);
+        }
       });
-    });
+    }));
   }
 
   getCurrentStubs() {
-    this.evaluate(function(){
-      return window.stubs;
+    // в evaluate нельзя передавать стрелочные функции!
+    this.evaluate(function () { // eslint-disable-line func-names, prefer-arrow-callback
+      return window.stubs; // eslint-disable-line no-undef
     });
   }
 
   capture(filename) {
     return new Promise((resolve, reject) => {
-      this.sendCmd({name: 'capture', params: {filename}}, (resp) => {
-        if (resp.status == 'ok') {
+      this.sendCmd({ name: 'capture', params: { filename } }, (resp) => {
+        if (resp.status === 'ok') {
           resolve();
         } else {
           reject(`capture(${filename})`);
@@ -579,10 +548,10 @@ class RemoteBrowser extends EventEmitter {
     });
   }
 
-  captureInPath(path) {
+  captureInPath(pathArg) {
     return new Promise((resolve, reject) => {
-      this.sendCmd({name: 'captureInPath', params: {path}}, (resp) => {
-        if (resp.status == 'ok') {
+      this.sendCmd({ name: 'captureInPath', params: { pathArg } }, (resp) => {
+        if (resp.status === 'ok') {
           resolve();
         } else {
           reject();
@@ -592,25 +561,23 @@ class RemoteBrowser extends EventEmitter {
   }
 
   getCount(selector) {
-    return new Promise((resolve, reject) => {
-      this.sendCmd({name: 'getCount', params: {selector}}, (resp) => {
+    return new Promise((resolve) => {
+      this.sendCmd({ name: 'getCount', params: { selector } }, (resp) => {
         resolve(resp.result);
       });
     });
   }
 
   waitForCount(selector, expectedCount, onTimeout) {
-    return this.waitFor(() => {
-      return new Promise((resolve, reject) => {
-        this.getCount(selector).then((foundCount) => {
-          if (foundCount === expectedCount) {
-            resolve();
-          } else {
-            reject(`Expected count of '${selector}' to be '${expectedCount}', but it was '${foundCount}'`);
-          }
-        });
+    return this.waitFor(() => new Promise((resolve, reject) => {
+      this.getCount(selector).then((foundCount) => {
+        if (foundCount === expectedCount) {
+          resolve();
+        } else {
+          reject(`Expected count of '${selector}' to be '${expectedCount}', but it was '${foundCount}'`);
+        }
       });
-    }, onTimeout);
+    }), onTimeout);
   }
 
   waitForSelectorText(selector, expectedText, exactMatch, onTimeout) {
@@ -622,56 +589,56 @@ class RemoteBrowser extends EventEmitter {
   }
 
   scrollSelectorToTop(selectorArg) {
-    return this.evaluate(function(selector) {
-      var el = window.__utils__.findOne(selector);
+    // в evaluate нельзя передавать стрелочные функции!
+    return this.evaluate(function (selector) { // eslint-disable-line func-names, prefer-arrow-callback
+      const el = window.__utils__.findOne(selector); // eslint-disable-line no-underscore-dangle, no-undef
       el.scrollTop = 0;
     }, selectorArg);
   }
 
   scrollSelectorToBottom(selectorArg) {
-    return this.evaluate(function(selector) {
-      var el = window.__utils__.findOne(selector);
+    // в evaluate нельзя передавать стрелочные функции!
+    return this.evaluate(function (selector) { // eslint-disable-line func-names, prefer-arrow-callback
+      const el = window.__utils__.findOne(selector); // eslint-disable-line no-underscore-dangle, no-undef
       el.scrollTop = el.scrollHeight;
     }, selectorArg);
   }
 
-  xpath(expression) {
+  xpath(expression) { // eslint-disable-line class-methods-use-this
     return {
-        type: 'xpath',
-        path: expression,
-        toString: function() {
-            return this.type + ' selector: ' + this.path;
-        }
+      type: 'xpath',
+      path: expression,
+      toString() {
+        return `${this.type} selector: ${this.path}`;
+      },
     };
   }
 
   fillForm(selector, vals, options) {
-    return this.then(() => {
-      return new Promise((resolve, reject) => {
-        this.sendCmd({name: 'fillForm', params: {selector, vals, options}}, (resp) => {
-          if (resp.status == 'ok') {
-            resolve();
-          } else {
-            reject(`fillForm('${selector}', '${vals}', '${options}')`);
-          }
-        });
+    return this.then(() => new Promise((resolve, reject) => {
+      this.sendCmd({ name: 'fillForm', params: { selector, vals, options } }, (resp) => {
+        if (resp.status === 'ok') {
+          resolve();
+        } else {
+          reject(`fillForm('${selector}', '${vals}', '${options}')`);
+        }
       });
-    });
+    }));
   }
 
   fillSelectors(formSelector, vals, submit) {
     return this.fillForm(formSelector, vals, {
-      submit: submit,
-      selectorType: 'css'
+      submit,
+      selectorType: 'css',
     });
   }
-};
+}
 
 
 RemoteBrowser.prototype.WAIT_TIMEOUT = browserArgs.waitTimeout || 30000;
 RemoteBrowser.prototype.CHECK_INTERVAL = 50;
 
-RemoteBrowser.deleteLocalStorageBaseDir = function() {
+RemoteBrowser.deleteLocalStorageBaseDir = function deleteLocalStorageBaseDir() {
   rimraf.sync(localStorageBaseDir);
 };
 
