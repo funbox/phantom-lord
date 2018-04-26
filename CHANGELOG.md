@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.5.0 (26.04.2018)
+
+* Added Windows support.
+
 ## 2.4.0 (02.03.2018)
 
 * Added `addLocalStorageItemToQueue`.
