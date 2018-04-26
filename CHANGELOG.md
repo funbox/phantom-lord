@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.0 (26.04.2018)
+
+* Added ESLint.
+
 ## 2.5.0 (26.04.2018)
 
 * Added Windows support.
