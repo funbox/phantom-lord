@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.1 (04.05.2018)
+
+* Fixed regexp support in mocks.
+
 ## 2.6.0 (26.04.2018)
 
 * Added ESLint.
