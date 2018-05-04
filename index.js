@@ -8,7 +8,7 @@ const rimraf = require('rimraf');
 const phantomjs = require('phantomjs-prebuilt');
 
 // eslint-disable-next-line no-extend-native
-RegExp.prototype.toJSON = () => `re:${this.source}`; // для сохранения regexp в моках
+RegExp.prototype.toJSON = function toJSON() { return `re:${this.source}`; }; // для сохранения regexp в моках
 const f = utils.format;
 const browserArgs = JSON.parse(process.env.BROWSER_ARGS || '{}');
 const localStorageBaseDir = path.resolve('node_modules/.funbox-phantom-lord-local-storage');
