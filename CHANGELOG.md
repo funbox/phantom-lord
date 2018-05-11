@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.0 (11.05.2018)
+
+* Added `clear` method for inputs.
+
 ## 2.6.1 (04.05.2018)
 
 * Fixed regexp support in mocks.
