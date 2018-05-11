@@ -632,6 +632,12 @@ class RemoteBrowser extends EventEmitter {
       selectorType: 'css',
     });
   }
+
+  clear(selectorArg) {
+    this.evaluate(function (selector) { // eslint-disable-line func-names, prefer-arrow-callback
+      document.querySelector(selector).value = ''; // eslint-disable-line no-undef
+    }, selectorArg);
+  }
 }
 
 
