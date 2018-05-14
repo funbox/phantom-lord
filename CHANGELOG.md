@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.0 (14.05.2018)
+
+* Moved from PhantomJS to Puppeteer.
+
 ## 2.7.0 (11.05.2018)
 
 * Added `clear` method for inputs.
