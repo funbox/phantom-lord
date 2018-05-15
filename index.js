@@ -156,10 +156,12 @@ class RemoteBrowser extends EventEmitter {
   }
 
   open(url) {
+    const errorWithUsefulStack = new Error();
     return this.then(async () => {
       const resp = await this.processCmd({ name: 'open', params: { url } });
       if (resp.status !== STATUS.OK) {
-        throw new Error(`open page error: ${resp.status}`);
+        errorWithUsefulStack.message = `open page error: ${resp.status}`;
+        throw errorWithUsefulStack;
       }
     });
   }
@@ -262,33 +264,39 @@ class RemoteBrowser extends EventEmitter {
   }
 
   click(selector, elementX, elementY) {
+    const errorWithUsefulStack = new Error();
     return this.then(async () => {
       const resp = await this.processCmd({ name: 'click', params: { selector, elementX, elementY } });
 
       if (resp.status !== STATUS.OK) {
         debug(`click error: ${resp.status}`);
-        throw new Error(`click(${selector} error: ${resp.status})`);
+        errorWithUsefulStack.message = `click(${selector} error: ${resp.status})`;
+        throw errorWithUsefulStack;
       }
     });
   }
 
   clickViaOther(selector, otherSelector) {
+    const errorWithUsefulStack = new Error();
     return this.then(async () => {
       const resp = await this.processCmd({ name: 'clickViaOther', params: { selector, otherSelector } });
       if (resp.status !== STATUS.OK) {
         debug(`debug: clickViaOther error: ${resp.status}`);
-        throw new Error(`clickViaOther(${selector}, ${otherSelector})`);
+        errorWithUsefulStack.message = `clickViaOther(${selector}, ${otherSelector})`;
+        throw errorWithUsefulStack;
       }
     });
   }
 
   hover(selector, elementX, elementY) {
+    const errorWithUsefulStack = new Error();
     return this.then(async () => {
       const resp = await this.processCmd({ name: 'hover', params: { selector, elementX, elementY } });
 
       if (resp.status !== STATUS.OK) {
         debug(`hover error: ${resp.status}`);
-        throw new Error(`hover(${selector} error: ${resp.status})`);
+        errorWithUsefulStack.message = `hover(${selector} error: ${resp.status})`;
+        throw errorWithUsefulStack;
       }
     });
   }
@@ -317,11 +325,13 @@ class RemoteBrowser extends EventEmitter {
   }
 
   _sendKeys(selector, keys, options) {
+    const errorWithUsefulStack = new Error();
     return this.then(async () => {
       const resp = await this.processCmd({ name: 'sendKeys', params: { selector, keys, options } });
       if (resp.status !== STATUS.OK) {
-        debug(`sendKeys error: ${response.status}`);
-        throw new Error(`sendKeys(${selector}, ${keys}, ${options})`);
+        debug(`sendKeys error: ${resp.status}`);
+        errorWithUsefulStack.message = `sendKeys(${selector}, ${keys}, ${options})`;
+        throw errorWithUsefulStack;
       }
     });
   }
@@ -404,7 +414,7 @@ class RemoteBrowser extends EventEmitter {
               this.emit('error', e.data);
             }
           } else {
-            this.emit('error', e);
+            this.emit('error', e instanceof Error ? e : new Error(e));
           }
         });
       } else {
@@ -576,11 +586,13 @@ class RemoteBrowser extends EventEmitter {
     };
   }
 
-  fillForm(selector, vals, options) {
+  fillForm(selector, vals, options = {}) {
+    const errorWithUsefulStack = new Error();
     return this.then(async () => {
       const resp = await this.processCmd({ name: 'fillForm', params: { selector, vals, options } });
       if (resp.status !== STATUS.OK) {
-        throw new Error(`fillForm('${selector}', '${vals}', '${options}')`);
+        errorWithUsefulStack.message = `fillForm('${selector}', '${JSON.stringify(vals)}', '${JSON.stringify(options)}')`;
+        throw errorWithUsefulStack;
       }
     });
   }
