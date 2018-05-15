@@ -220,9 +220,6 @@ class RemoteBrowser extends EventEmitter {
   waitFor(fn, onTimeout) {
     const errorWithUsefulStack = new Error();
     const startWaitingTime = +new Date();
-    if (process.env.E2E_TESTS_WITH_PAUSES) {
-      this.CHECK_INTERVAL += 300;
-    }
     return this.then(() => new Promise((resolve, reject) => {
       const self = this;
       function condNotSatisfied(error) {
@@ -1136,7 +1133,7 @@ function processSelector(selector) {
 }
 
 RemoteBrowser.prototype.WAIT_TIMEOUT = browserArgs.waitTimeout || 30000;
-RemoteBrowser.prototype.CHECK_INTERVAL = 50;
+RemoteBrowser.prototype.CHECK_INTERVAL = process.env.E2E_TESTS_WITH_PAUSES ? 300 : 50;
 RemoteBrowser.prototype.SLOW_MO = browserArgs.slowMo || 0;
 
 RemoteBrowser.deleteLocalStorageBaseDir = function () {
