@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1 (15.05.2018)
+
+* Fixed click and hover on elements by coords.
+
 ## 3.0.0 (14.05.2018)
 
 * Moved from PhantomJS to Puppeteer.
