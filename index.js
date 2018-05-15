@@ -264,9 +264,9 @@ class RemoteBrowser extends EventEmitter {
     });
   }
 
-  click(selector, x, y) {
+  click(selector, elementX, elementY) {
     return this.then(async () => {
-      const resp = await this.processCmd({ name: 'click', params: { selector, x, y } });
+      const resp = await this.processCmd({ name: 'click', params: { selector, elementX, elementY } });
 
       if (resp.status !== STATUS.OK) {
         debug(`click error: ${resp.status}`);
@@ -285,9 +285,9 @@ class RemoteBrowser extends EventEmitter {
     });
   }
 
-  hover(selector, x, y) {
+  hover(selector, elementX, elementY) {
     return this.then(async () => {
-      const resp = await this.processCmd({ name: 'hover', params: { selector, x, y } });
+      const resp = await this.processCmd({ name: 'hover', params: { selector, elementX, elementY } });
 
       if (resp.status !== STATUS.OK) {
         debug(`hover error: ${resp.status}`);
@@ -668,7 +668,7 @@ class RemoteBrowser extends EventEmitter {
       },
 
       async hover() {
-        const { selector, x, y } = cmd.params;
+        const { selector, elementX, elementY } = cmd.params;
         let res = '';
         const el = await this.findOne(selector);
 
@@ -681,8 +681,9 @@ class RemoteBrowser extends EventEmitter {
         }
 
         try {
-          if (x && y) {
-            await this.page.mouse.move(x, y);
+          if (elementX && elementY) {
+            const { x: elementOffsetLeft, y: elementOffsetTop } = await el.boundingBox();
+            await this.page.mouse.move(elementOffsetLeft + elementX, elementOffsetTop + elementY);
           } else {
             await el.hover();
           }
@@ -696,7 +697,7 @@ class RemoteBrowser extends EventEmitter {
       },
 
       async click() {
-        const { selector, x, y } = cmd.params;
+        const { selector, elementX, elementY } = cmd.params;
         let res = '';
         const visibleElements = [];
         const els = await this.findAll(selector);
@@ -716,10 +717,11 @@ class RemoteBrowser extends EventEmitter {
         }
 
         try {
-          if (x && y) {
-            await this.page.mouse.click(x, y);
+          if (elementX && elementY) {
+            const { x: elementOffsetLeft, y: elementOffsetTop } = await visibleElements[0].boundingBox();
+            await this.page.mouse.click(elementOffsetLeft + elementX, elementOffsetTop + elementY);
           } else {
-            await visibleElements[0].click(); // кликаем по первому видимому из найденных
+            await visibleElements[0].click();
           }
           res = STATUS.OK;
         } catch (e) {
