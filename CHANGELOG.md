@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.2 (16.05.2018)
+
+* Fixed `E2E_TEST_WITH_PAUSES` behavior.
+
 ## 3.0.1 (15.05.2018)
 
 * Fixed click and hover on elements by coords.
