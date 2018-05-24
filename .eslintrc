@@ -1,0 +1,7 @@
+{
+  "extends": "./node_modules/eslint-config-funbox/.eslintrc",
+  "rules": {
+    "no-undef": "off",
+    "no-await-in-loop": "off"
+  }
+}
