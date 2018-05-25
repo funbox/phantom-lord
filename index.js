@@ -305,6 +305,17 @@ class RemoteBrowser extends EventEmitter {
     return this.click(selector);
   }
 
+  clickSelectorText(selector, text) {
+    return this.then(async () => {
+      const resp = await this.processCmd({ name: 'clickSelectorText', params: { selector, text } });
+
+      if (resp.status !== STATUS.OK) {
+        debug(`clickSelectorText error: ${resp.status}`);
+        throw new Error(`clickSelectorText(${selector}, '${text}' error: ${resp.status})`);
+      }
+    });
+  }
+
   _sendKeys(selector, keys, options) {
     return this.then(async () => {
       const resp = await this.processCmd({ name: 'sendKeys', params: { selector, keys, options } });
@@ -631,6 +642,48 @@ class RemoteBrowser extends EventEmitter {
           return ({ status: STATUS.OK });
         }
         return ({ status: STATUS.NOT_FOUND, text: elementText });
+      },
+
+      async clickSelectorText() {
+        const { selector, text } = cmd.params;
+        let res = '';
+        let visibleElement;
+        let matchedByTextElement;
+        const els = await this.findAll(selector);
+
+        if (els.length === 0) {
+          return ({ status: STATUS.NOT_FOUND });
+        }
+
+        for (const el of els) { // eslint-disable-line no-restricted-syntax
+          const elementText = await this.fetchTextFromElement(el);
+
+          if (elementText === text) {
+            matchedByTextElement = el;
+
+            if (await this.visible(el)) {
+              visibleElement = el;
+              break;
+            }
+          }
+        }
+
+        if (!matchedByTextElement) {
+          return ({ status: STATUS.NOT_FOUND });
+        }
+
+        if (!visibleElement) {
+          return ({ status: STATUS.INVISIBLE });
+        }
+
+        try {
+          await visibleElement.click();
+          res = STATUS.OK;
+        } catch (e) {
+          debug(e);
+          res = 'clickError';
+        }
+        return ({ status: res });
       },
 
       async checkSelectorValue() {
@@ -968,15 +1021,19 @@ class RemoteBrowser extends EventEmitter {
     return element;
   }
 
+  async fetchTextFromElement(element) {
+    return this.page.evaluate((e) => {
+      if (e.innerHTML.includes('&nbsp;')) e.innerHTML = e.innerHTML.replace(/&nbsp;/g, ' '); // заменяем no-break space на обычный пробел
+      return e.textContent || e.innerText || e.value || '';
+    }, element);
+  }
+
   async fetchText(selector) {
     let text = '';
     const elements = await this.findAll(selector);
     if (elements && elements.length) {
       for (const element of elements) { // eslint-disable-line no-restricted-syntax
-        text += await this.page.evaluate((e) => {
-          if (e.innerHTML.includes('&nbsp;')) e.innerHTML = e.innerHTML.replace(/&nbsp;/g, ' '); // заменяем no-break space на обычный пробел
-          return e.textContent || e.innerText || e.value || '';
-        }, element);
+        text += await this.fetchTextFromElement(element);
       }
     }
     return text;
