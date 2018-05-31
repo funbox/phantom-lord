@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.0 (31.05.2018)
+
+* Added `clickSelectorText` method.
+
 ## 3.0.2 (16.05.2018)
 
 * Fixed `E2E_TEST_WITH_PAUSES` behavior.
