@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.0 (07.06.2018)
+
+* Added correct stack trace generation in cmds w/o delays.
+
 ## 3.1.0 (31.05.2018)
 
 * Added `clickSelectorText` method.
