@@ -2,10 +2,19 @@ const EventEmitter = require('events').EventEmitter;
 const puppeteer = require('puppeteer');
 
 const commandsList = require('./lib/commands');
-const pageUtils = require('./lib/page');
+const openPage = require('./lib/page/open');
 const { debug, onCloseCb } = require('./lib/utils');
 
 const browserArgs = JSON.parse(process.env.BROWSER_ARGS || '{}');
+
+const proxyHandler = {
+  get(target, property) {
+    if (property in commandsList) {
+      return (...args) => commandsList[property](target, ...args);
+    }
+    return target[property];
+  },
+};
 
 // eslint-disable-next-line no-extend-native
 RegExp.prototype.toJSON = function toJSON() { return `re:${this.source}`; }; // для сохранения regexp в моках
@@ -25,19 +34,12 @@ class RemoteBrowser extends EventEmitter {
     this.cookiesQueue = [];
     this.localStorageItemsQueue = [];
     this.testSettings = {};
-    this.pageUtils = {};
     this.isInitialized = false;
 
-    this.onCloseCallback = onCloseCb.bind(this, 'close');
-    this.onExitCallback = onCloseCb.bind(this, 'exit');
+    this.onCloseCallback = (...args) => { onCloseCb(this, 'close', ...args); };
+    this.onExitCallback = (...args) => { onCloseCb(this, 'exit', ...args); };
 
-    Object.keys(commandsList).forEach((cmd) => {
-      this[cmd] = commandsList[cmd].bind(this);
-    });
-
-    Object.keys(pageUtils).forEach((cmd) => {
-      this.pageUtils[cmd] = pageUtils[cmd].bind(this);
-    });
+    return new Proxy(this, proxyHandler);
   }
 
   async startRemoteBrowser() {
@@ -54,7 +56,7 @@ class RemoteBrowser extends EventEmitter {
       this.chromium.process().on('close', this.onCloseCallback);
       this.chromium.process().on('exit', this.onExitCallback);
 
-      this.page = await this.pageUtils.openPage();
+      this.page = await openPage(this);
 
       debug(`Puppeteer ${this.pid}: Remote browser has been started. Current version: ${await this.chromium.version()}`);
       console.log(`Puppeteer ${this.pid}: start processing steps`);
