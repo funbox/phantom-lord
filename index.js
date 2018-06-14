@@ -10,6 +10,7 @@ const browserArgs = JSON.parse(process.env.BROWSER_ARGS || '{}');
 const proxyHandler = {
   get(target, property) {
     if (property in commandsList) {
+      target.cmdId += 1;
       return (...args) => commandsList[property](target, ...args);
     }
     return target[property];
