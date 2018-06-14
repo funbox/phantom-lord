@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.0 (14.06.2018)
+
+* Split index.js on separated modules and renamed some of them.
+
 ## 3.2.0 (07.06.2018)
 
 * Added correct stack trace generation in cmds w/o delays.
