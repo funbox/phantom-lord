@@ -23,10 +23,7 @@ class RemoteBrowser extends EventEmitter {
     this.state = 'notStarted';
     this.chromium = null;
     this.page = null;
-    this.currentStep = 0;
     this.cmdId = 0;
-    this.stepInsertOffset = 1;
-    this.steps = [];
     this.browserErrors = [];
     this.stubsQueue = [];
     this.cookiesQueue = [];
@@ -57,70 +54,12 @@ class RemoteBrowser extends EventEmitter {
       this.page = await openPage(this);
 
       debug(`Puppeteer ${this.pid}: Remote browser has been started. Current version: ${await this.chromium.version()}`, 'info');
-      console.log(`Puppeteer ${this.pid}: start processing steps`);
+      console.log(`Puppeteer ${this.pid}: start processing commands`);
 
       this.state = 'started';
-      this.stepInsertOffset = 1;
-      this.processSteps();
     } catch (error) {
       debug(`debug: ${error.toString()}`, 'error');
       this.emit('phantomError', error.message);
-    }
-  }
-
-  then(fn) {
-    debug(`debug: currentStep: ${this.currentStep}, stepInsertOffset: ${this.stepInsertOffset}, stepsCount: ${this.steps.length}`, 'info');
-    this.steps.splice(this.currentStep + this.stepInsertOffset, 0, fn);
-    this.stepInsertOffset += 1;
-    this.processSteps();
-    return this;
-  }
-
-  processSteps(lastRes) {
-    if (this.state === 'notStarted') {
-      this.startRemoteBrowser();
-      return;
-    }
-
-    if (this.state !== 'started' || this.processing) return;
-
-    if (this.currentStep >= this.steps.length) {
-      this.emit('stepsFinished');
-      return;
-    }
-
-    this.processing = true;
-
-    const step = this.steps[this.currentStep];
-
-    try {
-      const stepRes = step(lastRes);
-      const processNext = (curRes) => {
-        this.currentStep += 1;
-        this.stepInsertOffset = 1;
-        this.processing = false;
-        this.processSteps(curRes);
-      };
-
-      if (stepRes && stepRes.then) {
-        stepRes.then(processNext, (e) => {
-          debug(`processing step ${this.currentStep} of ${this.steps.length} failed`, 'error');
-
-          if (e && e.type) {
-            if (e.type === 'timeout') {
-              this.emit('timeout', e.data);
-            } else {
-              this.emit('error', e.data);
-            }
-          } else {
-            this.emit('error', e instanceof Error ? e : new Error(e));
-          }
-        });
-      } else {
-        processNext(stepRes);
-      }
-    } catch (e) {
-      this.emit('error', e);
     }
   }
 
