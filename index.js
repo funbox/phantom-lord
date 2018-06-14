@@ -17,9 +17,6 @@ const proxyHandler = {
   },
 };
 
-// eslint-disable-next-line no-extend-native
-RegExp.prototype.toJSON = function toJSON() { return `re:${this.source}`; }; // для сохранения regexp в моках
-
 class RemoteBrowser extends EventEmitter {
   constructor() {
     super();
