@@ -4,6 +4,7 @@ const puppeteer = require('puppeteer');
 const commandsList = require('./lib/commands');
 const openPage = require('./lib/page/open');
 const { debug, onCloseCb, checkCmd } = require('./lib/utils');
+const { STATE } = require('./lib/utils/constants');
 
 const browserArgs = JSON.parse(process.env.BROWSER_ARGS || '{}');
 
@@ -23,7 +24,7 @@ const proxyHandler = {
 class RemoteBrowser extends EventEmitter {
   constructor() {
     super();
-    this.state = 'notStarted';
+    this.state = STATE.NOT_STARTED;
     this.chromium = null;
     this.page = null;
     this.cmdId = 0;
@@ -41,8 +42,8 @@ class RemoteBrowser extends EventEmitter {
   }
 
   async startRemoteBrowser() {
-    if (this.state !== 'notStarted') return;
-    this.state = 'starting';
+    if (this.state !== STATE.NOT_STARTED) return;
+    this.state = STATE.STARTING;
 
     try {
       this.chromium = await puppeteer.launch({
@@ -59,7 +60,7 @@ class RemoteBrowser extends EventEmitter {
       debug(`Puppeteer ${this.pid}: Remote browser has been started. Current version: ${await this.chromium.version()}`, 'info');
       console.log(`Puppeteer ${this.pid}: start processing commands`);
 
-      this.state = 'started';
+      this.state = STATE.STARTED;
     } catch (error) {
       debug(`debug: ${error.toString()}`, 'error');
       this.emit('phantomError', error.message);
@@ -68,11 +69,11 @@ class RemoteBrowser extends EventEmitter {
 
   async exit() {
     if (!this.chromium || !this.chromium.process()) {
-      this.state = 'notStarted';
+      this.state = STATE.NOT_STARTED;
       return null;
     }
 
-    this.state = 'exiting';
+    this.state = STATE.EXITING;
 
     const startWaitingTime = +new Date();
     return new Promise(async (resolve, reject) => {
@@ -89,7 +90,7 @@ class RemoteBrowser extends EventEmitter {
       };
 
       function waiter() {
-        if (self.state === 'notStarted') {
+        if (self.state === STATE.NOT_STARTED) {
           resolve();
         } else notKilled();
       }
