@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 
 const commandsList = require('./lib/commands');
 const openPage = require('./lib/page/open');
-const { debug, onCloseCb } = require('./lib/utils');
+const { debug, onCloseCb, checkCmd } = require('./lib/utils');
 
 const browserArgs = JSON.parse(process.env.BROWSER_ARGS || '{}');
 
@@ -11,7 +11,10 @@ const proxyHandler = {
   get(target, property) {
     if (property in commandsList) {
       target.cmdId += 1;
-      return (...args) => commandsList[property](target, ...args);
+      return (...args) => {
+        checkCmd(target, property, ...args);
+        return commandsList[property](target, ...args);
+      };
     }
     return target[property];
   },
