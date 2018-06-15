@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.1 (15.06.2018)
+
+* Removed `checkCmd` call in `clear` command.
+* Fixed error that occurred when one was getting element's text.
+
 ## 4.0.0 (14.06.2018)
 
 * Split index.js on separated modules and renamed some of them.
