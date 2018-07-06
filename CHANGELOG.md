@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.0 (06.07.2017)
+
+* Moved the package into the @funboxteam scope.
+
 ## 4.0.1 (15.06.2018)
 
 * Removed `checkCmd` call in `clear` command.
