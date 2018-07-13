@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.1 (13.07.2018)
+
+* Fixed path to Phantom Lord while running the project.
+
 ## 5.0.0 (06.07.2017)
 
 * Moved the package into the @funboxteam scope.
