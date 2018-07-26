@@ -56,20 +56,20 @@ class RemoteBrowser extends EventEmitter {
 
       this.page = await openPage(this);
 
-      debug(`Puppeteer ${this.pid}: Remote browser has been started. Current version: ${await this.chromium.version()}`);
+      debug(`Puppeteer ${this.pid}: Remote browser has been started. Current version: ${await this.chromium.version()}`, 'info');
       console.log(`Puppeteer ${this.pid}: start processing steps`);
 
       this.state = 'started';
       this.stepInsertOffset = 1;
       this.processSteps();
     } catch (error) {
-      debug(`debug: ${error.toString()}`);
+      debug(`debug: ${error.toString()}`, 'error');
       this.emit('phantomError', error.message);
     }
   }
 
   then(fn) {
-    debug(`debug: currentStep: ${this.currentStep}, stepInsertOffset: ${this.stepInsertOffset}, stepsCount: ${this.steps.length}`);
+    debug(`debug: currentStep: ${this.currentStep}, stepInsertOffset: ${this.stepInsertOffset}, stepsCount: ${this.steps.length}`, 'info');
     this.steps.splice(this.currentStep + this.stepInsertOffset, 0, fn);
     this.stepInsertOffset += 1;
     this.processSteps();
@@ -104,7 +104,7 @@ class RemoteBrowser extends EventEmitter {
 
       if (stepRes && stepRes.then) {
         stepRes.then(processNext, (e) => {
-          debug(`processing step ${this.currentStep} of ${this.steps.length} failed`);
+          debug(`processing step ${this.currentStep} of ${this.steps.length} failed`, 'error');
 
           if (e && e.type) {
             if (e.type === 'timeout') {
@@ -136,7 +136,7 @@ class RemoteBrowser extends EventEmitter {
     return new Promise(async (resolve, reject) => {
       const self = this;
       const notKilled = () => {
-        debug(`debug: browser state: ${this.state}`);
+        debug(`debug: browser state: ${this.state}`, 'debug');
 
         const currentTime = +new Date();
         if (currentTime - startWaitingTime < this.WAIT_TIMEOUT) {
@@ -174,7 +174,7 @@ RemoteBrowser.prototype.SLOW_MO = browserArgs.slowMo || 0;
 RemoteBrowser.prototype.HEADLESS = !(process.env.HEADLESS_OFF || browserArgs.headlessOff);
 
 RemoteBrowser.deleteLocalStorageBaseDir = function () { // eslint-disable-line func-names
-  debug('Deprecation warning: вызов функции deleteLocalStorageBaseDir более не требуется.');
+  debug('Deprecation warning: вызов функции deleteLocalStorageBaseDir более не требуется.', 'warn');
 };
 
 
