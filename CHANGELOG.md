@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.2 (27.07.2018)
+
+* Fixed app project root path calculation.
+
 ## 5.0.1 (13.07.2018)
 
 * Fixed path to Phantom Lord while running the project.
