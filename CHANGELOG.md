@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.1.0 (27.07.2018)
+
+* Colorized debug logs.
+* Added output stack trace for console errors.
+
 ## 5.0.2 (27.07.2018)
 
 * Fixed app project root path calculation.
