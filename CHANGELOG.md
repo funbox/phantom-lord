@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.0.0 (31.07.2018)
+
+* Move from stepped evaluation model derived from Casper to proper async-await.
+
 ## 5.1.0 (27.07.2018)
 
 * Colorized debug logs.
