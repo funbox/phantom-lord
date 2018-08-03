@@ -69,6 +69,10 @@ class RemoteBrowser extends EventEmitter {
   }
 
   async exit() {
+    if (this.page) {
+      this.page.removeAllListeners('console');
+    }
+
     if (!this.chromium || !this.chromium.process()) {
       this.state = STATE.NOT_STARTED;
       return null;
@@ -96,6 +100,14 @@ class RemoteBrowser extends EventEmitter {
         } else notKilled();
       }
 
+      await (() => new Promise((CDPResolve) => {
+        const CDPWaiter = setInterval(() => {
+          if (!self.CDPConnectionsInProgress) {
+            clearInterval(CDPWaiter);
+            CDPResolve();
+          }
+        }, 5);
+      }))();
       await this.chromium.close();
       waiter();
     });
