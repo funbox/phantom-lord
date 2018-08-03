@@ -34,6 +34,7 @@ class RemoteBrowser extends EventEmitter {
     this.localStorageItemsQueue = [];
     this.testSettings = {};
     this.isInitialized = false;
+    this.CDPConnectionsInProgress = 0;
 
     this.onCloseCallback = (...args) => { onCloseCb(this, 'close', ...args); };
     this.onExitCallback = (...args) => { onCloseCb(this, 'exit', ...args); };
