@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.0.1 (16.07.2018)
+
+* Fix 'Unhandled promise rejection' before closing the browser.
+
 ## 6.0.0 (31.07.2018)
 
 * Move from stepped evaluation model derived from Casper to proper async-await.
