@@ -103,7 +103,6 @@ await browser.waitForText('Найти');
 * `phantomError` — возникла ошибка при отправке команды в связанный процесс Chromium (обычно это говорит о том, что процесс вскоре аварийно завершится);
 * `browserErrors` — возникли JS-ошибки на странице;
 * `exit` — связанный процесс Chromium завершился;
-* `stepsFinished` — шаги в очереди закончились.
 
 Подписаться на обработку событий можно следующим образом:
 
@@ -165,7 +164,7 @@ const Browser = require('funbox-phantom-lord');
 Запуск браузера и настройка вывода ошибок:
 
 ```javascript
-browser = new Browser();
+const browser = new Browser();
 browser.on('timeout', () => console.log('browser timeout!'));
 browser.on('error', () => console.log('browser error!'));
 await browser.startRemoteBrowser();
@@ -189,13 +188,14 @@ await browser.waitForText('показов в месяц');
 Простейший код с использованием данного тестового фреймворка будет выглядеть так:
 
 ```javascript
+const Browser = require('funbox-phantom-lord');
 let browser;
 let restartReason;
 let test;
 
 describe('Проверка yandex.ru', function() {
   // Здесь не стрелочная функция, чтобы Mocha.js могла подменить контекст this.
-  beforeEach(function() {
+  beforeEach(async function() {
     test = this.currentTest;
 
     browser = new Browser();
@@ -280,7 +280,7 @@ describe('Проверка yandex.ru', function() {
   it('тест поиска', async () => {
     await browser.open('https://ya.ru');
     await browser.waitForText('Найти');
-    await browser.sendKeys('.form__field', 'hello');
+    await browser.sendKeys('.input__control', 'hello');
     await browser.click('button');
     await browser.waitForUrl('yandex.ru');
     await browser.waitForText('показов в месяц'); // если мы не дождемся данной надписи, тест провалится
