@@ -1,8 +1,8 @@
-# funbox-phantom-lord
+# @funboxteam/phantom-lord
 
 ## Описание библиотеки
 
-**funbox-phantom-lord** — это библиотека, предоставляющая удобный интерфейс для взаимодействия с [Headless Chromium](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md), вдохновлённая [CasperJS](http://casperjs.org/).
+**phantom-lord** — это библиотека, предоставляющая удобный интерфейс для взаимодействия с [Headless Chromium](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md), вдохновлённая [CasperJS](http://casperjs.org/).
 
 Библиотека может использоваться для автоматизированного тестирования, создания обходчиков сайтов и других задач, требующих наличия виртуального браузера.
 
@@ -18,7 +18,7 @@
 
 ### Каталог проекта
 
-Для определения корневого каталога проекта в **funbox-phantom-lord** используется [app-root-path](https://www.npmjs.com/package/app-root-path). В частности, в корневом каталоге создается подкаталог `screenshots`.
+Для определения корневого каталога проекта в **phantom-lord** используется [app-root-path](https://www.npmjs.com/package/app-root-path). В частности, в корневом каталоге создается подкаталог `screenshots`.
 Ввиду [особенностей app-root-path](https://www.npmjs.com/package/app-root-path#primary-method), не стоит размещать свой проект в каталоге с названием `node_modules` или его подкаталогах.
 
 * Правильно: `~/work/my-project/`
@@ -29,7 +29,7 @@
 Чтобы приступить к работе с браузером, подключите библиотеку в проект и создайте экземпляр класса `Browser`:
 
 ```
-const Browser = require('@funbox/phantom-lord');
+const Browser = require('@funboxteam/phantom-lord');
 const browser = new Browser();
 ```
 
@@ -158,7 +158,7 @@ console.log(`Текущее состояние: ${browser.state}`);
 Подключение библиотеки:
 
 ```javascript
-const Browser = require('funbox-phantom-lord');
+const Browser = require('@funboxteam/phantom-lord');
 ```
 
 Запуск браузера и настройка вывода ошибок:
@@ -188,7 +188,7 @@ await browser.waitForText('показов в месяц');
 Простейший код с использованием данного тестового фреймворка будет выглядеть так:
 
 ```javascript
-const Browser = require('funbox-phantom-lord');
+const Browser = require('@funboxteam/phantom-lord');
 let browser;
 let restartReason;
 let test;
