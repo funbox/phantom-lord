@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.1.0 (04.09.2018)
+
+* Fixed behavoir of `waitWhileVisible` and `waitUntilVisible`.
+
 ## 6.0.1 (16.07.2018)
 
 * Fix 'Unhandled promise rejection' before closing the browser.
