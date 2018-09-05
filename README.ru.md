@@ -24,6 +24,15 @@
 * Правильно: `~/work/my-project/`
 * Неправильно: `~/work/node_modules/my-project/`
 
+### Создание экземпляра браузера
+
+Чтобы приступить к работе с браузером, подключите библиотеку в проект и создайте экземпляр класса `Browser`:
+
+```
+const Browser = require('@funbox/phantom-lord');
+const browser = new Browser();
+```
+
 ### Команды
 
 Список доступных команд находится в файле [lib/commands/index.js](./lib/commands/index.js).
