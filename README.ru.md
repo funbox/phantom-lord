@@ -16,10 +16,6 @@
 
 ## Особенности работы с библиотекой
 
-### Команды
-
-Список доступных команд находится в файле [lib/commands/index.js](./lib/commands/index.js).
-
 ### Каталог проекта
 
 Для определения корневого каталога проекта в **funbox-phantom-lord** используется [app-root-path](https://www.npmjs.com/package/app-root-path). В частности, в корневом каталоге создается подкаталог `screenshots`.
@@ -27,6 +23,10 @@
 
 * Правильно: `~/work/my-project/`
 * Неправильно: `~/work/node_modules/my-project/`
+
+### Команды
+
+Список доступных команд находится в файле [lib/commands/index.js](./lib/commands/index.js).
 
 ### Использование команд и порядок их выполнения
 
