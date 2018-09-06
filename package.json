@@ -1,6 +1,6 @@
 {
   "name": "@funboxteam/phantom-lord",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "description": "Библиотека для связи Node.js и PhantomJS",
   "main": "index.js",
   "scripts": {

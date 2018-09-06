@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.2.0 (06.09.2018)
+
+* Improved README.
+
 ## 6.1.0 (04.09.2018)
 
 * Fixed behavoir of `waitWhileVisible` and `waitUntilVisible`.
