@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.2.1 (28.09.2018)
+
+* Replaced emitting `browserErrors` event to throwing error.
+
 ## 6.2.0 (06.09.2018)
 
 * Improved README.
@@ -135,7 +139,7 @@
 
 ## 1.8.0 (03.10.2017)
 
-* Added browserError event to handle JS errors of test pages.
+* Added `browserErrors` event to handle JS errors of test pages.
 
 ## 1.7.0 (28.09.2017)
 
