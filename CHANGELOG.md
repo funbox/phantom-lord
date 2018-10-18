@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.2.2 (18.10.2018)
+
+* Added output msg of browser's console when error occurs in `console` event.
+
 ## 6.2.1 (28.09.2018)
 
 * Replaced emitting `browserErrors` event to throwing error.
