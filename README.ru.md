@@ -195,9 +195,7 @@ let test;
 
 describe('Проверка yandex.ru', function() {
   // Здесь не стрелочная функция, чтобы Mocha.js могла подменить контекст this.
-  beforeEach(async function() {
-    test = this.currentTest;
-
+  before(async function() {
     browser = new Browser();
 
     browser.on('timeout', (e) => {
@@ -240,44 +238,51 @@ describe('Проверка yandex.ru', function() {
         test.callback(new Error('Unexpected Chromium exit'));
       }
     });
-    
+
     // после добавления всех обработчиков запускаем браузер
     await browser.startRemoteBrowser();
   });
 
-  afterEach(function() {
-    const exit = () => browser.exit();
+  after(async function() {
+    // После проведения тестов нужно завершить работу браузера, иначе останется зомби-процесс.
+    await browser.exit();
+  });
 
+  beforeEach(async function() {
+    test = this.currentTest;
+  });
+
+  afterEach(async function() {
     // Если тест завершился с ошибкой, делаем скриншот для удобства разбора падения.
     if (this.currentTest.state === 'failed') {
       // Если падение теста произошло по вине падения Chromium, то пытаться сделать скриншот бесполезно.
       if (browser.state !== 'started') {
         console.log(`Не делаем скриншот, потому что browser.state = ${browser.state}`);
-        return undefined;
+      } else {
+        let t = this.currentTest;
+        const p = [];
+        while (t) {
+          p.unshift(t.title);
+          t = t.parent;
+        }
+
+        const pad = (x) => (x < 10 ? '0' : '') + x;
+        const time = new Date(parseInt(process.env.E2E_TESTS_START_TIMESTAMP, 10));
+        p.unshift(`${time.getFullYear()}_${pad((time.getMonth() + 1))}_${pad(time.getDate())}_${pad(time.getHours())}_${pad(time.getMinutes())}_${pad(time.getSeconds())}`);
+
+        p.unshift('screenshots');
+        const fname = `${p.join('/')}.png`;
+        browser.testAlreadyFailed = true;
+
+        await browser.capture(fname);
       }
-      let t = this.currentTest;
-      const p = [];
-      while (t) {
-        p.unshift(t.title);
-        t = t.parent;
-      }
-
-      const pad = (x) => (x < 10 ? '0' : '') + x;
-      const time = new Date(parseInt(process.env.E2E_TESTS_START_TIMESTAMP, 10));
-      p.unshift(`${time.getFullYear()}_${pad((time.getMonth() + 1))}_${pad(time.getDate())}_${pad(time.getHours())}_${pad(time.getMinutes())}_${pad(time.getSeconds())}`);
-
-      p.unshift('screenshots');
-      const fname = `${p.join('/')}.png`;
-      browser.testAlreadyFailed = true;
-
-      // Не важно, как завершилась команда получения скриншота, после нее нужно в любом случае завершить работу браузера, иначе останется зомби-процесс.
-      return browser.capture(fname).then(exit, exit);
     }
 
-    return exit();
+    // Вызов browser.closePage() повлечет за собой открытие новой вкладки при следующем browser.open().
+    await browser.closePage();
   });
 
-  it('тест поиска', async () => {
+  it('тест поиска 1', async () => {
     await browser.open('https://ya.ru');
     await browser.waitForText('Найти');
     await browser.sendKeys('.input__control', 'hello');
@@ -285,8 +290,18 @@ describe('Проверка yandex.ru', function() {
     await browser.waitForUrl('yandex.ru');
     await browser.waitForText('показов в месяц'); // если мы не дождемся данной надписи, тест провалится
   });
+
+  it('тест поиска 2', async () => {
+    await browser.open('https://ya.ru');
+    await browser.waitForText('Найти');
+    await browser.sendKeys('.input__control', 'world');
+    await browser.click('button');
+    await browser.waitForUrl('yandex.ru');
+    await browser.waitForText('показов в месяц'); // если мы не дождемся данной надписи, тест провалится
+  });
 });
 ```
+
 ## Совместимость с предыдущими версиями библиотеки
 
 ### Содержимое страницы

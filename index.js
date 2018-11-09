@@ -2,7 +2,6 @@ const EventEmitter = require('events').EventEmitter;
 const puppeteer = require('puppeteer');
 
 const commandsList = require('./lib/commands');
-const openPage = require('./lib/page/open');
 const { debug, onCloseCb, checkCmd } = require('./lib/utils');
 const { STATE } = require('./lib/utils/constants');
 
@@ -56,8 +55,6 @@ class RemoteBrowser extends EventEmitter {
       this.chromium.process().on('close', this.onCloseCallback);
       this.chromium.process().on('exit', this.onExitCallback);
 
-      this.page = await openPage(this);
-
       debug(`Puppeteer ${this.pid}: Remote browser has been started. Current version: ${await this.chromium.version()}`, 'info');
       console.log(`Puppeteer ${this.pid}: start processing commands`);
 
@@ -65,6 +62,19 @@ class RemoteBrowser extends EventEmitter {
     } catch (error) {
       debug(`debug: ${error.toString()}`, 'error');
       this.emit('phantomError', error.message);
+    }
+  }
+
+  async closePage() {
+    this.isInitialized = false;
+
+    this.stubsQueue = [];
+    this.cookiesQueue = [];
+    this.localStorageItemsQueue = [];
+
+    if (this.page) {
+      await this.page.close();
+      this.page = null;
     }
   }
 
