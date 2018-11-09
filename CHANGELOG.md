@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.3.0 (18.10.2018)
+
+* Separated browser firing from page opening.
+
 ## 6.2.2 (18.10.2018)
 
 * Added output msg of browser's console when error occurs in `console` event.
