@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.4.0 (14.12.2018)
+
+* Added setting cursor position in `sendKeys` cmd.
+
 ## 6.3.0 (18.10.2018)
 
 * Separated browser firing from page opening.
