@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.4.1 (10.01.2019)
+
+* Added `sendKeys` docs to README.
+
 ## 6.4.0 (14.12.2018)
 
 * Added setting cursor position in `sendKeys` cmd.
