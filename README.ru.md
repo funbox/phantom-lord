@@ -291,8 +291,8 @@ describe('Проверка yandex.ru', function() {
       }
     }
 
-    // Вызов browser.closePage() повлечет за собой открытие новой вкладки при следующем browser.open().
-    await browser.closePage();
+    // Вызов browser.closeAllPages() закроет все вкладки и повлечет за собой открытие новой вкладки при следующем browser.open().
+    await browser.closeAllPages();
   });
 
   it('тест поиска 1', async () => {
@@ -313,6 +313,34 @@ describe('Проверка yandex.ru', function() {
     await browser.waitForText('показов в месяц'); // если мы не дождемся данной надписи, тест провалится
   });
 });
+```
+
+Работа с вкладками:
+
+```javascript
+  it('тест открытия страницы в новой вкладке', async () => {
+    await browser.open('https://yandex.ru');
+    await browser.click('[data-id="video"]'); // клик по ссылке откроет страницу в новой вкладке
+
+    // если мы не дождемся открытия этой вкладки, тест провалится
+    // после успешной проверки вкладка будет закрыта
+    await browser.waitForTab(/yandex\.ru\/portal\/video/);
+  });
+
+  it('тест с проверками в новой вкладке', async () => {
+    await browser.open('https://yandex.ru');
+    await browser.waitForText('Карты');
+    await browser.click('[data-id="video"]');
+
+    await browser.waitForTab(/yandex\.ru\/portal\/video/, async () => {
+      // проверка выполняется на странице, открытой в новой вкладке
+      // если мы не дождемся данной надписи на странице в новой вкладке, тест провалится
+      await browser.waitForText('Что посмотреть');
+    });
+
+    // проверка выполняется на начальной вкладке
+    await browser.waitForText('Карты');
+  });
 ```
 
 ## Совместимость с предыдущими версиями библиотеки

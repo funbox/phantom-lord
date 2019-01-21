@@ -20,6 +20,15 @@ const proxyHandler = {
   },
 };
 
+/**
+ * @param {JSHandle<ConsoleMessage>} handle
+ * @returns {Promise<string>}
+ */
+async function stringifyMessageHandle(handle) {
+  const res = await handle.executionContext().evaluate(m => String((m && m.stack) || m), handle);
+  return res;
+}
+
 class RemoteBrowser extends EventEmitter {
   constructor() {
     super();
@@ -55,6 +64,51 @@ class RemoteBrowser extends EventEmitter {
       this.chromium.process().on('close', this.onCloseCallback);
       this.chromium.process().on('exit', this.onExitCallback);
 
+      this.chromium.on('targetcreated', async (target) => {
+        const page = await target.page();
+        if (!page) return;
+
+        page.on('error', (error) => {
+          debug(`Browser page unexpectedly crashed. Reason: ${error.message}`, 'error');
+          this.emit('exit', 1, 'SIGKILL');
+        });
+
+        page.on('console', async (message) => {
+          const severityLevel = message.type() === 'error' ? 'error' : 'verbose';
+
+          try {
+            this.CDPConnectionsInProgress += 1;
+            const args = await Promise.all(message.args()
+              .map(stringifyMessageHandle));
+            debug(`CONSOLE: ${args.join(' ')}`, severityLevel);
+          } catch (e) {
+            debug(`CONSOLE: ${message.text()}`, severityLevel);
+            debug(`Некритическая ошибка: ${e.message}`, 'warn');
+          } finally {
+            this.CDPConnectionsInProgress -= 1;
+          }
+        });
+
+        page.on('pageerror', (error) => {
+          const { message } = error;
+          const notCriticalErrors = [
+            'ymaps: script not loaded',
+            '[WDS] Disconnected!',
+          ];
+
+          if (notCriticalErrors.indexOf(message) >= 0) {
+            debug(`Некритическая ошибка: ${message}`, 'warn');
+          } else {
+            debug(message, 'error');
+            this.browserErrors.push({ msg: message });
+          }
+        });
+
+        page.on('framenavigated', async (frame) => {
+          debug(`Redirected to ${frame.url()}`, 'info');
+        });
+      });
+
       debug(`Puppeteer ${this.pid}: Remote browser has been started. Current version: ${await this.chromium.version()}`, 'info');
       console.log(`Puppeteer ${this.pid}: start processing commands`);
 
@@ -75,6 +129,16 @@ class RemoteBrowser extends EventEmitter {
     if (this.page) {
       await this.page.close();
       this.page = null;
+    }
+  }
+
+  async closeAllPages() {
+    await this.closePage();
+
+    const pages = await this.chromium.pages();
+
+    for (let i = this.HEADLESS ? 0 : 1; i < pages.length; i += 1) {
+      await pages[i].close();
     }
   }
 
