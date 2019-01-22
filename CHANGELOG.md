@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.5.0 (10.01.2019)
+
+* Added support for browser tabs.
+
 ## 6.4.1 (10.01.2019)
 
 * Added `sendKeys` docs to README.
