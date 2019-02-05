@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.5.1 (05.02.2019)
+
+* Fixed firing `performMouseAction` for hover.
+
 ## 6.5.0 (10.01.2019)
 
 * Added support for browser tabs.
