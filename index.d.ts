@@ -37,6 +37,8 @@ declare class RemoteBrowser extends EventEmitter {
 
   clear(selectorArg: string): Promise<void>;
 
+  clearTextField(selector: Selector): Promise<void|never>;
+
   click(selector: Selector, elementX?: number, elementY?: number): Promise<void|never>;
 
   /**
