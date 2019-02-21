@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.6.0 (21.02.2019)
+
+* Added type declaration file.
+
 ## 6.5.1 (05.02.2019)
 
 * Fixed firing `performMouseAction` for hover.
