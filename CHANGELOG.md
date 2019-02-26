@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.7.0 (26.02.2019)
+
+* Added `clearTextField` command.
+
 ## 6.6.0 (21.02.2019)
 
 * Added type declaration file.
