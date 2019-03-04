@@ -35,9 +35,7 @@ declare class RemoteBrowser extends EventEmitter {
 
   captureInPath(pathArg: string): Promise<void>;
 
-  clear(selectorArg: string): Promise<void>;
-
-  clearTextField(selector: Selector): Promise<void|never>;
+  clear(selector: Selector): Promise<void|never>;
 
   click(selector: Selector, elementX?: number, elementY?: number): Promise<void|never>;
 
