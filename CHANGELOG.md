@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.8.0 (06.03.2019)
+
+* Replaced `clear` cmd with `clearTextField`.
+
 ## 6.7.0 (26.02.2019)
 
 * Added `clearTextField` command.
