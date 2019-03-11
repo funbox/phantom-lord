@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.8.1 (11.03.2019)
+
+* Add preventing proxing own prototype methods through `checkCommand`.
+
 ## 6.8.0 (06.03.2019)
 
 * Replaced `clear` cmd with `clearTextField`.
