@@ -9,7 +9,7 @@ const browserArgs = JSON.parse(process.env.BROWSER_ARGS || '{}');
 
 const proxyHandler = {
   get(target, property) {
-    if (property in commandsList) {
+    if (Object.keys(commandsList).includes(property)) {
       target.cmdId += 1;
       return (...args) => {
         checkCmd(target, property, ...args);
