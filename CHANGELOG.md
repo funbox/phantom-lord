@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.9.0 (18.03.2019)
+
+* Replaced nbsp with normal space in `waitForText` command.
+
 ## 6.8.1 (11.03.2019)
 
 * Add preventing proxing own prototype methods through `checkCommand`.
