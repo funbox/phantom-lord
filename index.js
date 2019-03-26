@@ -56,7 +56,7 @@ class RemoteBrowser extends EventEmitter {
 
     try {
       this.chromium = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--allow-insecure-localhost'],
         headless: this.HEADLESS,
         slowMo: this.SLOW_MO,
       });
