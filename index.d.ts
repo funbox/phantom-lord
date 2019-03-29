@@ -75,6 +75,8 @@ declare class RemoteBrowser extends EventEmitter {
 
   waitForCount(selector: Selector, expectedCount: number, onTimeout?: Fn): Promise<void|never>;
 
+  waitForEventListener(selector: Selector, eventType: string, onTimeout?: Fn): Promise<void|never>;
+
   waitForSelector(selector: Selector, onTimeout?: Fn): Promise<void|never>;
 
   waitForSelectorText(selector: Selector, expectedText: any, exactMatch?: boolean, onTimeout?: Fn): Promise<void|never>;
