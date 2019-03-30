@@ -1,8 +1,12 @@
 # Changelog
 
+## 6.10.0 (30.03.2019)
+
+* Added `waitForEventListener` cmd.
+
 ## 6.9.1 (27.03.2019)
 
-* Add argument `--allow-insecure-localhost` to Puppeteer launch cmd.
+* Added argument `--allow-insecure-localhost` to Puppeteer launch cmd.
 
 ## 6.9.0 (18.03.2019)
 
