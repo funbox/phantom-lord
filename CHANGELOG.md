@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.11.0 (16.04.2019)
+
+* Returned `innerText` instead of `textContent` in `fetchTextFromElement`.
+
 ## 6.10.0 (30.03.2019)
 
 * Added `waitForEventListener` cmd.
