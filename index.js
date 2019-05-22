@@ -12,7 +12,7 @@ const proxyHandler = {
     if (Object.keys(commandsList).includes(property)) {
       target.cmdId += 1;
       return (...args) => {
-        checkCmd(target, property, ...args);
+        checkCmd(target, property, commandsList[property].skipBrowserErrorsCheck, ...args);
         return commandsList[property](target, ...args);
       };
     }
@@ -125,6 +125,7 @@ class RemoteBrowser extends EventEmitter {
     this.stubsQueue = [];
     this.cookiesQueue = [];
     this.localStorageItemsQueue = [];
+    this.browserErrors = [];
 
     if (this.page) {
       await this.page.close();
