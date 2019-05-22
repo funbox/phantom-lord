@@ -233,13 +233,6 @@ describe('Проверка yandex.ru', function() {
       test.callback(new Error(e)); // в случае ошибки при выполнении шага завершаем тест с ошибкой
     });
 
-    // В случае, если в браузере возникла ошибка, завершаем тест.
-    // Для некоторых систем наличие ошибок в браузере — нормальная ситуация, но для большинства — нет.
-    browser.on('browserErrors', (e) => {
-      console.log('Ошибка браузера, тест провален');
-      test.callback(new Error(e[0].msg));
-    });
-
     // Обработка внутренней ошибки funbox-phantom-lord (падение Chromium).
     browser.on('phantomError', (e) => {
       if (browser.testAlreadyFailed) {
@@ -301,6 +294,11 @@ describe('Проверка yandex.ru', function() {
 
         await browser.capture(fname);
       }
+    }
+
+    // Если тест успел пройти, но остались незамоканные запросы, тест упадет с ошибкой
+    if (browser.browserErrors.length > 0 && this.currentTest.state !== 'failed') {
+      test.callback(new Error(browser.browserErrors[0].msg));
     }
 
     // Вызов browser.closeAllPages() закроет все вкладки и повлечет за собой открытие новой вкладки при следующем browser.open().
