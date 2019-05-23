@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.12.0 (23.05.2019)
+
+* Added installation info to README.
+
 ## 6.11.0 (16.04.2019)
 
 * Returned `innerText` instead of `textContent` in `fetchTextFromElement`.
