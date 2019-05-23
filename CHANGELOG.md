@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.13.0 (23.05.2019)
+
+* Fixed browser errors handling.
+
 ## 6.12.0 (23.05.2019)
 
 * Added installation info to README.
