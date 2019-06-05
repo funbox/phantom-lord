@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0.0 (05.06.2019)
+
+* Returned `textContent` instead of `innerText` in `fetchTextFromElement`.
+
 ## 6.13.0 (23.05.2019)
 
 * Fixed browser errors handling.
