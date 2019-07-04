@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.1.0 (04.07.2019)
+
+* Updated Puppeteer to 1.18.1.
+
 ## 7.0.0 (05.06.2019)
 
 * Returned `textContent` instead of `innerText` in `fetchTextFromElement`.
