@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.0.0 (17.07.2019)
+
+* Added waiting for element in commands `click` & `clickSelectorText`.
+
 ## 7.1.0 (04.07.2019)
 
 * Updated Puppeteer to 1.18.1.
