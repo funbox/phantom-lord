@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.0.1 (20.09.2019)
+
+* Fixed clearing input value with large amount of symbols.
+
 ## 8.0.0 (17.07.2019)
 
 * Added waiting for element in commands `click` & `clickSelectorText`.
