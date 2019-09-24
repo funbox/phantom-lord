@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.0.2 (24.09.2019)
+
+* Fixed reporting error of non found element.
+
 ## 8.0.1 (20.09.2019)
 
 * Fixed clearing input value with large amount of symbols.
