@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.0.0 (06.10.2019)
+
+* Removed useless deps.
+
 ## 8.1.0 (06.10.2019)
 
 * Updated Mocha to 6.2.1.
