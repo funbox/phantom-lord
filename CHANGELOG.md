@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.0 (06.10.2019)
+
+* Updated Mocha to 6.2.1.
+
 ## 8.0.2 (24.09.2019)
 
 * Fixed reporting error of non found element.
