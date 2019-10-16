@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.1.0 (16.10.2019)
+
+* Added moving cursor to the end of the input before pressing Backspace.
+
 ## 9.0.0 (06.10.2019)
 
 * Removed useless deps.
