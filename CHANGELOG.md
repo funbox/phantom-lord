@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.2.0 (17.12.2019)
+
+* Improved moving cursor to the end of input before pressing Backspace.
+
 ## 9.1.0 (16.10.2019)
 
 * Added moving cursor to the end of the input before pressing Backspace.
