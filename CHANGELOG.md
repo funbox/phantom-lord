@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.2.1 (09.04.2020)
+
+* Prevented overriding elements' content.
+
 ## 9.2.0 (17.12.2019)
 
 * Improved moving cursor to the end of input before pressing Backspace.
