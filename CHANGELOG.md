@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.3.0 (07.05.2020)
+
+* Fixed setting test data while navigating to a new page.
+
 ## 9.2.1 (09.04.2020)
 
 * Prevented overriding elements' content.
