@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.4.0 (30.06.2020)
+
+* Fixed creating screenshots on Windows.
+
 ## 9.3.0 (07.05.2020)
 
 * Fixed setting test data while navigating to a new page.
