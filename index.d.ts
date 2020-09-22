@@ -81,7 +81,7 @@ declare class RemoteBrowser extends EventEmitter {
 
   waitForSelectorText(selector: Selector, expectedText: any, exactMatch?: boolean, onTimeout?: Fn): Promise<void|never>;
 
-  waitForSelectorValue(selector: Selector, expectedValue: any, exactMatch?: boolean, onTimeout?: Fn): Promise<void|never>;
+  waitForSelectorValue(selector: Selector, expectedValue: any, onTimeout?: Fn): Promise<void|never>;
 
   waitForTab(url: string|RegExp, fn?: () => Promise<void>, onTimeout?: Fn): Promise<void|never>;
 
