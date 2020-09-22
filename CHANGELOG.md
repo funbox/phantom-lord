@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.5.0 (22.09.2020)
+
+* Removed useless param of `waitForSelectorValue`.
+
 ## 9.4.0 (30.06.2020)
 
 * Fixed creating screenshots on Windows.
