@@ -1,5 +1,5 @@
 {
-  "extends": "./node_modules/eslint-config-funbox/.eslintrc",
+  "extends": "@funboxteam",
   "rules": {
     "no-undef": "off",
     "no-await-in-loop": "off"
