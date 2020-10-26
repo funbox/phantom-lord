@@ -11,7 +11,7 @@ declare class RemoteBrowser extends EventEmitter {
   private cookiesQueue: Cookie[];
   private localStorageItemsQueue: LocalStorageItem[];
 
-  // управление состоянием браузера
+  // browser state managers
 
   startRemoteBrowser(): Promise<void>;
 
@@ -21,7 +21,7 @@ declare class RemoteBrowser extends EventEmitter {
 
   exit(): Promise<void>;
 
-  // команды для взаимодействия с содержимым страницы
+  // page content managers
 
   addCookieToQueue(cookie: Cookie): Promise<void|never>;
 
@@ -40,8 +40,8 @@ declare class RemoteBrowser extends EventEmitter {
   click(selector: Selector, elementX?: number, elementY?: number): Promise<void|never>;
 
   /**
-   * @param label - текст, который должен содержаться в теге
-   * @param tag - тег в разметке, по которому нужно кликнуть
+   * @param {string} label - text that should be inside the tag
+   * @param {string=} tag - tag that should be clicked
    */
   clickLabel(label: string, tag?: string): Promise<void|never>;
 
@@ -50,8 +50,8 @@ declare class RemoteBrowser extends EventEmitter {
   clickViaOther(selector: Selector, otherSelector: Selector): Promise<void|never>
 
   /**
-   * @param fn - функция, которую нужно выполнить на странице
-   * @param args - аргументы, передаваемые в выполняемую функцию
+   * @param {Function} fn - function that will be evaluated on the page
+   * @param {...*} args - arguments of the function
    */
   evaluate(fn: string | ((...args: any[]) => any), ...args: any[]): Promise<any>
 
@@ -97,11 +97,12 @@ declare class RemoteBrowser extends EventEmitter {
 
   waitWhileVisible(selector: Selector, onTimeout?: Fn): Promise<void|never>;
 
-  //утилитарные методы
+  // utils methods
 
   xpath(expression: string): Exclude<Selector, string>;
 
-  // внутренние методы, нужны здесь, чтобы проходил тест на наличие методов в декларационном файле
+  // internals methods
+  // should be placed here for proper tests working
 
   private checkSelectorText(selector: Selector, text: any, exactMatch?: boolean): Promise<void|never>;
   private checkSelectorValue(selector: Selector, value: any): Promise<void|never>;

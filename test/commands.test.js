@@ -7,9 +7,9 @@ const RemoteBrowser = require('../');
 const declFilePath = resolvePath(__dirname, '../index.d.ts');
 const skipMethods = ['sendCmd', 'deleteLocalStorageBaseDir'];
 
-describe('Декларационный файл', () => {
-  it('Содержит команды из директории lib/commands и методы RemoteBrowser', () => {
-    const declarationFile = fs.readFileSync(declFilePath, { encoding: 'utf-8' });
+describe('Declaration file', () => {
+  it('contains commands from lib/commands and methods of RemoteBrowser', () => {
+    const declarationFile = fs.readFileSync(declFilePath, 'utf-8');
     const missingCommands = [];
     const classFields = Object.getOwnPropertyNames(RemoteBrowser.prototype);
     const ownMethods = classFields.filter(field => (
@@ -24,14 +24,14 @@ describe('Декларационный файл', () => {
 
     if (missingCommands.length > 0) {
       const errorMessage = missingCommands.length === 1
-        ? `Команда ${missingCommands[0]} отсутствует в декларационном файле index.d.ts.`
-        : `Команды ${missingCommands.join(', ')} отсутствуют в декларационном файле index.d.ts.`;
+        ? `The command ${missingCommands[0]} is not found in index.d.ts.`
+        : `The commands ${missingCommands.join(', ')} are not found in index.d.ts.`;
       throw new Error(errorMessage);
     }
   });
 
-  it('Не содержит лишних методов', () => {
-    const declarationFile = fs.readFileSync(declFilePath, { encoding: 'utf-8' });
+  it('does not contain excess methods', () => {
+    const declarationFile = fs.readFileSync(declFilePath, 'utf-8');
     const methodRegex = /\s(\w+)\(.*\):.+;/g;
     const classFields = Object.getOwnPropertyNames(RemoteBrowser.prototype);
     const ownMethods = classFields.filter(field => (
@@ -51,8 +51,8 @@ describe('Декларационный файл', () => {
 
     if (redundantMethods.length > 0) {
       const errorMessage = redundantMethods.length === 1
-        ? `Команда ${redundantMethods[0]} объявлена в декларационном файле, но более не используется.`
-        : `Команды ${redundantMethods.join(', ')} объявлены в декларационном файле, но более не используются.`;
+        ? `The command ${redundantMethods[0]} is declared in index.d.ts, but not used anymore.`
+        : `The commands ${redundantMethods.join(', ')} are declared in index.d.ts, but not used anymore.`;
       throw new Error(errorMessage);
     }
   });

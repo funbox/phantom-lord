@@ -1,7 +1,7 @@
 {
   "name": "@funboxteam/phantom-lord",
   "version": "9.5.0",
-  "description": "Библиотека для связи Node.js и PhantomJS",
+  "description": "Handy API for Headless Chromium",
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {

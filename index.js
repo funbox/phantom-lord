@@ -83,7 +83,7 @@ class RemoteBrowser extends EventEmitter {
             debug(`CONSOLE: ${args.join(' ')}`, severityLevel);
           } catch (e) {
             debug(`CONSOLE: ${message.text()}`, severityLevel);
-            debug(`Некритическая ошибка: ${e.message}`, 'warn');
+            debug(`Non critical error: ${e.message}`, 'warn');
           } finally {
             this.CDPConnectionsInProgress -= 1;
           }
@@ -97,7 +97,7 @@ class RemoteBrowser extends EventEmitter {
           ];
 
           if (notCriticalErrors.indexOf(message) >= 0) {
-            debug(`Некритическая ошибка: ${message}`, 'warn');
+            debug(`Non critical error: ${message}`, 'warn');
           } else {
             debug(message, 'error');
             this.browserErrors.push({ msg: message });
@@ -205,7 +205,7 @@ RemoteBrowser.prototype.SLOW_MO = browserArgs.slowMo || 0;
 RemoteBrowser.prototype.HEADLESS = !(process.env.HEADLESS_OFF || browserArgs.headlessOff);
 
 RemoteBrowser.deleteLocalStorageBaseDir = function () { // eslint-disable-line func-names
-  debug('Deprecation warning: вызов функции deleteLocalStorageBaseDir более не требуется.', 'warn');
+  debug('Deprecation warning: deleteLocalStorageBaseDir should not be fired anymore.', 'warn');
 };
 
 
