@@ -25,8 +25,8 @@
 
 ## Преимущества библиотеки
 
-В качестве виртуального браузера используется Headless Chromium, благодаря чему страница, открытая в виртуальном браузере, 
-будет иметь тот же вид, что и в обычном Chrome с графическим интерфейсом.
+В качестве виртуального браузера используется Headless Chromium, из-за чего страница выглядит так же, как и в обычном 
+Chrome с графическим интерфейсом.
 
 Для управления браузером используется библиотека [Puppeteer](https://developers.google.com/web/tools/puppeteer/). 
 В отличие от CasperJS и PhantomJS, все управляющие инструкции выполняются в контексте Node.js, 
@@ -151,9 +151,8 @@ await browser.waitForText('показов в месяц');
             t = t.parent;
           }
   
-          const pad = (x) => (x < 10 ? '0' : '') + x;
           const time = new Date(parseInt(process.env.E2E_TESTS_START_TIMESTAMP, 10));
-          p.unshift(`${time.getFullYear()}_${pad((time.getMonth() + 1))}_${pad(time.getDate())}_${pad(time.getHours())}_${pad(time.getMinutes())}_${pad(time.getSeconds())}`);
+          p.unshift(time.getTime());
   
           p.unshift('screenshots');
           const fname = `${p.join('/')}.png`;
@@ -178,7 +177,7 @@ await browser.waitForText('показов в месяц');
       await browser.sendKeys('.input__control', 'hello');
       await browser.click('button');
       await browser.waitForUrl('yandex.ru');
-      await browser.waitForText('показов в месяц'); // если мы не дождемся данной надписи, тест провалится
+      await browser.waitForText('показов в месяц'); // Если мы не дождемся данной надписи, тест провалится
     });
   
     it('тест поиска 2', async () => {
@@ -187,7 +186,7 @@ await browser.waitForText('показов в месяц');
       await browser.sendKeys('.input__control', 'world');
       await browser.click('button');
       await browser.waitForUrl('yandex.ru');
-      await browser.waitForText('показов в месяц'); // если мы не дождемся данной надписи, тест провалится
+      await browser.waitForText('показов в месяц'); // Если мы не дождемся данной надписи, тест провалится
     });
   });
   ```
@@ -198,12 +197,12 @@ await browser.waitForText('показов в месяц');
     it('тест открытия страницы в новой вкладке', async () => {
       await browser.open('https://yandex.ru');
 
-      // предположим, что клик по такой ссылке откроет страницу в новой вкладке
+      // Предположим, что клик по такой ссылке откроет страницу в новой вкладке
       await browser.click('[data-id="video"]');
   
-      // если мы не дождемся открытия этой вкладки, тест провалится
+      // Если мы не дождемся открытия этой вкладки, тест провалится
       await browser.waitForTab(/yandex\.ru\/portal\/video/);
-      // после успешной проверки вкладка будет автоматически закрыта
+      // После успешной проверки вкладка будет автоматически закрыта
     });
   
     it('тест с проверками в новой вкладке', async () => {
@@ -212,12 +211,12 @@ await browser.waitForText('показов в месяц');
       await browser.click('[data-id="video"]');
   
       await browser.waitForTab(/yandex\.ru\/portal\/video/, async () => {
-        // проверка выполняется на странице, открытой в новой вкладке
-        // если мы не дождемся данной надписи на странице в новой вкладке, тест провалится
+        // Проверка выполняется на странице, открытой в новой вкладке
+        // Если мы не дождемся данной надписи на странице в новой вкладке, тест провалится
         await browser.waitForText('Что посмотреть');
       });
   
-      // эта проверка выполняется на начальной вкладке
+      // Эта проверка выполняется на начальной вкладке
       await browser.waitForText('Карты');
     });
   ```
@@ -248,8 +247,6 @@ await browser.waitForText('показов в месяц');
 
 Однако, при попытке выполнить команду, взаимодействующую со страницей, 
 до непосредственного открытия браузера, будет возвращена ошибка `notStarted`. 
-В этом случае нужно либо вручную вызвать `browser.startRemoteBrowser()` (будет открыта пустая страница `about:blank`), 
-либо вызвать `browser.open()` с необходимым адресом в качестве аргумента.
 
 ### Особенности работы с отдельными командами
 
@@ -273,7 +270,7 @@ await browser.sendKeys('.text-field_masked input[type=text]', '9001234567', 'sta
 
 * `error` — возникла критическая ошибка в процессе выполнения команды;
 * `timeout` — достигнут таймаут в процессе выполнения команды;
-* `phantomError` — возникла ошибка при отправке команды в Chromium;
+* `phantomError` — возникла ошибка при отправке команды в Chromium
   (обычно это говорит о том, что процесс вскоре аварийно завершится);
 * `browserErrors` — возникли JS-ошибки на странице;
 * `exit` — Chromium завершился.
@@ -389,9 +386,8 @@ Error: Expected text of '.dialog__content p' to be 'Вы уверены, что 
 
 ### Очистка Local Storage
 
-Поскольку предыдущие версии библиотеки были основаны на использовании PhantomJS, уникальный путь к Local Storage 
-создавался средствами самой библиотеки Phantom Lord и требовал ручной очистки с помощью вызова 
-`Browser.deleteLocalStorageBaseDir();`.
+Поскольку предыдущие версии библиотеки были основаны на PhantomJS, уникальный путь к Local Storage создавался средствами 
+самой библиотеки Phantom Lord и требовал ручной очистки с помощью вызова `Browser.deleteLocalStorageBaseDir();`.
 
 В новой версии вызов данной функции более не требуется.
 
