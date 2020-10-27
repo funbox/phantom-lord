@@ -2,13 +2,23 @@
   "name": "@funboxteam/phantom-lord",
   "version": "9.5.0",
   "description": "Handy API for Headless Chromium",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/funbox/phantom-lord"
+  },
+  "files": [
+    "lib/",
+    "index.js",
+    "index.d.ts"
+  ],
+  "author": "FunBox LLC <wanted@fun-box.ru> (https://funbox.ru)",
+  "license": "MIT",
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
     "test": "mocha",
     "lint": "eslint --cache -c .eslintrc --ext .js ./"
   },
-  "license": "MIT",
   "dependencies": {
     "app-root-path": "2.1.0",
     "fs-extra": "5.0.0",
