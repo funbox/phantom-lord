@@ -1,5 +1,9 @@
 # @funboxteam/phantom-lord
 
+<img align="right" width="192" height="192"
+     alt="Лого Phantom Lord: Золотой щит с лицом фантома в короне, на чёрном фоне"
+     src="./logo.png">
+
 [![npm](https://img.shields.io/npm/v/@funboxteam/phantom-lord.svg)](https://www.npmjs.com/package/@funboxteam/phantom-lord)
 
 Удобное АПИ для взаимодействия 
@@ -409,5 +413,9 @@ Error: Expected text of '.dialog__content p' to be 'Вы уверены, что 
 
 Для подстраховки добавлены тесты, которые проверяют соответствие методов, объявленных в декларационном файле, 
 командам из `lib/commands` и собственным методам `RemoteBrowser`.
+
+## Благодарности
+
+Роскошную картинку для репозитория нарисовал [Игорь Гарибальди](https://pandabanda.com/).
 
 [![Sponsored by FunBox](https://funbox.ru/badges/sponsored_by_funbox_centered.svg)](https://funbox.ru)

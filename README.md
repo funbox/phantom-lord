@@ -1,5 +1,9 @@
 # @funboxteam/phantom-lord
 
+<img align="right" width="192" height="192"
+     alt="Phantom Lord avatar: Golden shield with a crowned phantom face on a black background"
+     src="./logo.png">
+
 [![npm](https://img.shields.io/npm/v/@funboxteam/phantom-lord.svg)](https://www.npmjs.com/package/@funboxteam/phantom-lord)
 
 Handy API for [Headless Chromium](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md), 
@@ -394,5 +398,9 @@ changes of the class interface.
 
 For safety reasons, there're tests that check the matching of the methods from the declaration file, 
 the commands from `lib/commands` and the `RemoteBrowser` methods.
+
+## Credits
+
+Luxury picture for the project was made by [Igor Garybaldi](https://pandabanda.com/).
 
 [![Sponsored by FunBox](https://funbox.ru/badges/sponsored_by_funbox_centered.svg)](https://funbox.ru)
