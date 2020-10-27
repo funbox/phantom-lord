@@ -1,5 +1,12 @@
 # Changelog
 
+## 10.0.0 (27.10.2020)
+
+* Added LICENSE.
+* Prepared the package for publishing on GitHub.
+* Used `puppeteer@^1.18.1` instead of `puppeteer@1.18.1`.
+* Updated the deps.
+
 ## 9.5.0 (22.09.2020)
 
 * Removed useless param of `waitForSelectorValue`.
