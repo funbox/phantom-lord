@@ -9,7 +9,7 @@
 Handy API for [Headless Chromium](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md), 
 inspired by [CasperJS](http://casperjs.org/).
 
-Useful for automated testing, website scrapers creating and other tasks that require virtual browser.
+Useful for automated testing, creating website scrapers, and other tasks that require virtual browser.
 
 [По-русски](./README.ru.md)  
 
@@ -24,7 +24,7 @@ There's a library allowing to write tests on Node.js and run them in a virtual b
 In case of any problems it's required to know three programming languages and their tools (Node.js, Java, C++),
 otherwise it's hard to debug and takes too much time to solve them.
 
-Trying to solve the issues we'd written our own library — Phantom Lord.
+Trying to solve these issues we'd written our own library — Phantom Lord.
 
 ## Features
 
@@ -57,7 +57,7 @@ browser.on('error', () => console.log('browser error!'));
 await browser.startRemoteBrowser();
 ```
 
-Now you're able to run the commands:
+Now you're able to run commands:
 
 ```javascript
 await browser.open('https://google.com');
@@ -68,7 +68,7 @@ await browser.waitForUrl('google.com/search');
 await browser.waitForText('results');
 ```
 
-Since the library is the API for interacting with Headless Chromium only, additional tools should be used 
+Since the library is just an API for interacting with Headless Chromium, additional tools should be used 
 to write E2E tests. E.g. [Mocha](https://mochajs.org/) or 
 [@funboxteam/frontend-tests-runner](https://github.com/funbox/frontend-tests-runner). 
 
@@ -229,18 +229,18 @@ The list of available commands can be found in [lib/commands/index.js](./lib/com
 
 ### Project root directory
 
-Some commands have to know the path to the project root. E.g. `capture` use it to create a subdirectory for screenshots.
+Some commands have to know the path to the project root. E.g. `capture` uses it to create a subdirectory for screenshots.
 
 To find the project root directory Phantom Lord uses [app-root-path](https://www.npmjs.com/package/app-root-path) lib.
 And due to [some of its features](https://www.npmjs.com/package/app-root-path#primary-method) one should not store their
-project in the directory named `node_modules` or somewhere in it's subdirectories.
+project in the directory named `node_modules` or anywhere in it's subdirectories.
 
 * Correct: `~/work/my-project/`.
 * Incorrect: `~/work/node_modules/my-project/`.
 
 ### Launching the browser
 
-`browser.startRemoteBrowser()` is fired automatically when `browser.open()` is evaluated and the browser has't been
+`browser.startRemoteBrowser()` is fired automatically when `browser.open()` is evaluated and the browser hadn't been
 launched.
 
 However, if one will try to run any command interacting with a page before launching the browser, they will get 
@@ -273,7 +273,7 @@ Instance of `RemoteBrowser` emits these events:
 * `browserErrors` — JS errors have occurred on a page;
 * `exit` — Chromium has exited.
 
-`RemoteBrowser` inherits `EventEmitter`, thus to subscribe on the events use `on`:
+`RemoteBrowser` inherits `EventEmitter`, thus to subscribe to events use `on`:
 
 ```javascript
 browser.on('error', (e) => {
@@ -283,7 +283,7 @@ browser.on('error', (e) => {
 
 ### States
 
-At any moment of time `RemoteBrowser` instance may be in the one of the following states:
+At any moment of time `RemoteBrowser` instance may be in one of the following states:
 
 * `notStarted` — Chromium hasn't been started;
 * `starting` — Chromium is starting;
@@ -300,7 +300,7 @@ console.log(`Current state: ${browser.state}`);
 ### Environment variables
 
 * `DEBUG` — boolean; turns on debug logging (sent commands, received replies, console messages, etc).
-* `BROWSER_ARGS` — string; allow to tune the browser. The value is JSON setting arguments for virtual browser launch. 
+* `BROWSER_ARGS` — string; allows to tune the browser. The value is JSON setting arguments for virtual browser launch. 
   It may contain the following keys:
     * `viewportWidth` — number; width of the browser viewport (default: `1440`);
     * `viewportHeight` — number; height of the browser viewport (default: `900`);
@@ -323,7 +323,7 @@ To add the stubs use `addStubToQueue` function. It adds the passed subs to the a
 The function may be fired even before page loading. In this case the passed data will be added into `window.stubs` right
 after the page loading.
 
-The format of the stubs is completely depends on the developers way to use them. One thing that should be noted here is
+The format of the stubs is completely up to you. One thing that should be noted here is
 the fact that the passed data will be serialized, which means that they can't link to data from Node.js context.
 
 ### Local Storage
@@ -343,7 +343,7 @@ For example PhantomJS ignores non-breaking spaces between words. E.g. it will pa
 Headless Chromium will save the space and parse the string as “17 640”.
 
 **NB**. If the text content of an element contains non-breaking spaces they will be replaced with regular spaces 
-by Phantom Lord (e.g. when using `waitForSelectorText`). So, if some tests fails with the error like this:
+by Phantom Lord (e.g. when using `waitForSelectorText`). So, if some tests fail with the error like this:
 
 ```
 Error: Expected text of '.dialog__content p' to be 'Do you want to delete your profile?', but it was 'Do you want to delete your profile?'
@@ -359,17 +359,17 @@ There's a difference between click firing in PhantomJS and Headless Chromium.
 PhantomJS creates new `Event` and dispatches the event on the desired element using `EventTarget.dispatchEvent()`,
 while Headless Chromium calculates the coordinates of the element and makes the click on this coordinates.
 
-So there's a possibility of the situation when the click is success, but nothing happens after that 
-(but something should have happen). It may behave this way because the “coordinates click” interacts with an element
+So there's a possibility of the situation when the click is successful, but nothing happens after that 
+(but something should have happened). It may behave this way because the “coordinates click” interacts with an element
 placed “above” the desired one (on the Z axis). E.g. there may be a popup, loading indicator of something else that blocks
-the click. In this case some waiting command should be fired first, to wait for this blocking element disappear.  
+the click. In this case some waiting command should be fired first, to wait for this blocking element to disappear.  
 
 Pay special attention to clicks on “invisible” elements. PhantomJS and Headless Chromium can click on element even when
 it's 0×0 sized. But if the element or one of its parents has `display: none` CSS property set, then Headless Chromium
 won't be able to click on this element and will throw an `invisibleElement` error, because it won't be able to determine
 the element's box model and coordinates.
 
-In case of errors related to clicks on invisible elements, make sure that the elements or their parents does not have
+In case of errors related to clicks on invisible elements, make sure that the elements or their parents do not have
 styles that make them fully invisible. Otherwise run one more action before the click that will make invisible element 
 visible.
 
@@ -393,10 +393,10 @@ please [create an issue](https://github.com/funbox/phantom-lord/issues/new) to i
 There's `index.d.ts` in the root of the project. It helps IDEs to highlight properties and methods of `RemoteBrowser`
 and contains the information about methods' arguments and returned values.
 
-It's recommended to update the declaration file when new commands are added, old ones are removed or there're any other
+It's recommended to update the declaration file when new commands are added, old ones are removed or there are any other
 changes of the class interface. 
 
-For safety reasons, there're tests that check the matching of the methods from the declaration file, 
+For safety reasons, there are tests that check the matching of the methods from the declaration file, 
 the commands from `lib/commands` and the `RemoteBrowser` methods.
 
 ## Credits
