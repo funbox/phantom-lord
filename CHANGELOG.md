@@ -1,5 +1,11 @@
 # Changelog
 
+## 11.0.0 (10.11.2020)
+
+* Added `setRequestInterceptor`.
+* Reverted "Fix setting test data while navigating to a new page" from 9.3.0,
+  which probably has led to breaking backward compatibility.
+
 ## 10.0.0 (27.10.2020)
 
 * Added LICENSE.
