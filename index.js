@@ -43,6 +43,7 @@ class RemoteBrowser extends EventEmitter {
     this.testSettings = {};
     this.isInitialized = false;
     this.CDPConnectionsInProgress = 0;
+    this.requestInterceptor = null;
 
     this.onCloseCallback = (...args) => { onCloseCb(this, 'close', ...args); };
     this.onExitCallback = (...args) => { onCloseCb(this, 'exit', ...args); };
@@ -107,6 +108,13 @@ class RemoteBrowser extends EventEmitter {
         page.on('framenavigated', async (frame) => {
           debug(`Redirected to ${frame.url()}`, 'info');
         });
+
+        if (this.requestInterceptor) {
+          await page.setRequestInterception(true);
+          page.on('request', (request) => {
+            this.requestInterceptor(request);
+          });
+        }
       });
 
       debug(`Puppeteer ${this.pid}: Remote browser has been started. Current version: ${await this.chromium.version()}`, 'info');
@@ -196,6 +204,10 @@ class RemoteBrowser extends EventEmitter {
         return `${this.type} selector: ${this.path}`;
       },
     };
+  }
+
+  setRequestInterceptor(callback) {
+    this.requestInterceptor = callback;
   }
 }
 

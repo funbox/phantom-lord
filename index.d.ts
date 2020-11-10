@@ -10,6 +10,7 @@ declare class RemoteBrowser extends EventEmitter {
   private stubsQueue: Stub[];
   private cookiesQueue: Cookie[];
   private localStorageItemsQueue: LocalStorageItem[];
+  private requestInterceptor: Fn;
 
   // browser state managers
 
@@ -100,6 +101,7 @@ declare class RemoteBrowser extends EventEmitter {
   // utils methods
 
   xpath(expression: string): Exclude<Selector, string>;
+  setRequestInterceptor(callback: Fn): void;
 
   // internals methods
   // should be placed here for proper tests working

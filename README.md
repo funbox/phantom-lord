@@ -318,6 +318,8 @@ console.log(`Current state: ${browser.state}`);
 
 One of the common tasks for E2E tests is to add stubs on a page. Phantom Lord can do it.
 
+#### addStubToQueue
+
 To add the stubs use `addStubToQueue` function. It adds the passed subs to the array `window.stubs` on a page.
 
 The function may be fired even before page loading. In this case the passed data will be added into `window.stubs` right
@@ -325,6 +327,45 @@ after the page loading.
 
 The format of the stubs is completely up to you. One thing that should be noted here is
 the fact that the passed data will be serialized, which means that they can't link to data from Node.js context.
+
+#### setRequestInterceptor
+
+Also stubs can be done with `setRequestInterceptor` function.
+If you pass it a callback it will be called on every network request.
+The callback receives [HTTPRequest](https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#class-httprequest) as an
+argument.
+
+Usage example:
+
+```js
+browser.setRequestInterceptor((request) => {
+  const apiPrefix = utils.url('/api');
+
+  if (request.url().indexOf(apiPrefix) === 0) {
+    const shortUrl = request.url().replace(apiPrefix, '');
+    let foundStub;
+
+    stubs.forEach((stub) => {
+      if (stub.method.toLowerCase() === request.method().toLowerCase() && stub.url === shortUrl) {
+        foundStub = stub;
+      }
+    });
+
+    if (foundStub) {
+      request.respond({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(foundStub.data),
+      });
+      return;
+    }
+
+    browser.browserErrors.push({ msg: `Stub not found: ${request.method()} ${shortUrl}` });
+  }
+
+  request.continue();
+});
+```
 
 ### Local Storage
 

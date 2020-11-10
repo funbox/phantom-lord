@@ -329,6 +329,8 @@ console.log(`Текущее состояние: ${browser.state}`);
 
 При тестировании достаточно частой задачей является добавление стабов на страницу. Phantom Lord умеет работать с ними.
 
+#### addStubToQueue
+
 Для добавления нужно использовать функцию `addStubToQueue`. Она записывает переданные стабы в массив 
 `window.stubs` на странице.
 
@@ -338,6 +340,44 @@ console.log(`Текущее состояние: ${browser.state}`);
 Формат добавляемых стабов зависит от реализации на клиенте и не определяется библиотекой. Единственное, 
 о чем нужно помнить — передаваемые в браузер данные сериализуются, следовательно, нельзя ссылаться на данные внутри 
 процесса Node.js.
+
+#### setRequestInterceptor
+
+Также можно реализовать стабы с помощью функции `setRequestInterceptor`.
+Если передать в эту функцию коллбэк, то он будет вызываться при выполнении браузером сетевых запросов.
+В коллбэк передаётся объект [HTTPRequest](https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#class-httprequest).
+
+Пример использования:
+
+```js
+browser.setRequestInterceptor((request) => {
+  const apiPrefix = utils.url('/api');
+
+  if (request.url().indexOf(apiPrefix) === 0) {
+    const shortUrl = request.url().replace(apiPrefix, '');
+    let foundStub;
+
+    stubs.forEach((stub) => {
+      if (stub.method.toLowerCase() === request.method().toLowerCase() && stub.url === shortUrl) {
+        foundStub = stub;
+      }
+    });
+
+    if (foundStub) {
+      request.respond({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(foundStub.data),
+      });
+      return;
+    }
+
+    browser.browserErrors.push({ msg: `Stub not found: ${request.method()} ${shortUrl}` });
+  }
+
+  request.continue();
+});
+```
 
 ### Local Storage
 
