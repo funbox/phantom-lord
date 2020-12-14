@@ -1,5 +1,16 @@
 # Changelog
 
+## 12.0.0 (21.12.2020)
+
+* Updated `puppeteer` to ^5.0.0.
+
+If you depend on the Puppeteer's API then you should check this release notes
+for breaking changes:
+[v2.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v2.0.0),
+[v3.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v3.0.0),
+[v4.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v4.0.0),
+[v5.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v5.0.0).
+
 ## 11.0.0 (10.11.2020)
 
 * Added `setRequestInterceptor`.
@@ -288,7 +299,7 @@
 
 ## 1.4.0 (01.09.2017)
 
-* Move PhantomJS error into the separated event. 
+* Move PhantomJS error into the separated event.
   Now `error` is an ordinary error which should fail the test,
   while `phantomError` is something horrible that is not related to the test itself.
 * Added debug info.
