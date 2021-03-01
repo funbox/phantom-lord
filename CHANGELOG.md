@@ -1,5 +1,9 @@
 # Changelog
 
+## 12.0.1 (02.03.2021)
+
+* Improved regexp params logging.
+
 ## 12.0.0 (21.12.2020)
 
 * Updated `puppeteer` to ^5.0.0.
