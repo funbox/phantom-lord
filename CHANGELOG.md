@@ -1,5 +1,9 @@
 # Changelog
 
+## 12.1.0 (12.05.2021)
+
+* Added support for xPath selector in `clear` command.
+
 ## 12.0.1 (02.03.2021)
 
 * Improved regexp params logging.

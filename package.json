@@ -1,6 +1,6 @@
 {
   "name": "@funboxteam/phantom-lord",
-  "version": "12.0.1",
+  "version": "12.1.0",
   "description": "Handy API for Headless Chromium",
   "repository": {
     "type": "git",
