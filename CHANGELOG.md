@@ -1,5 +1,10 @@
 # Changelog
 
+## 12.1.1 (10.06.2021)
+
+* Fixed security vulnerabilities.
+
+
 ## 12.1.0 (12.05.2021)
 
 * Added support for xPath selector in `clear` command.
