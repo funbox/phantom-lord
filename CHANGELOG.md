@@ -1,5 +1,18 @@
 # Changelog
 
+## 13.0.0 (01.07.2021)
+
+Updated `puppeteer` to ^10.1.0.
+
+If you depend on the Puppeteer's API then you should check this release notes
+for breaking changes:
+[v6.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v6.0.0),
+[v7.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v7.0.0),
+[v8.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v8.0.0),
+[v9.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v9.0.0),
+[v10.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v10.0.0).
+
+
 ## 12.1.1 (10.06.2021)
 
 * Fixed security vulnerabilities.
