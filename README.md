@@ -395,16 +395,6 @@ In this case the test should be modified to replace non-breaking spaces with reg
 
 ### Click handling
 
-There's a difference between click firing in PhantomJS and Headless Chromium.
-
-PhantomJS creates new `Event` and dispatches the event on the desired element using `EventTarget.dispatchEvent()`,
-while Headless Chromium calculates the coordinates of the element and makes the click on this coordinates.
-
-So there's a possibility of the situation when the click is successful, but nothing happens after that 
-(but something should have happened). It may behave this way because the “coordinates click” interacts with an element
-placed “above” the desired one (on the Z axis). E.g. there may be a popup, loading indicator of something else that blocks
-the click. In this case some waiting command should be fired first, to wait for this blocking element to disappear.  
-
 Pay special attention to clicks on “invisible” elements. PhantomJS and Headless Chromium can click on element even when
 it's 0×0 sized. But if the element or one of its parents has `display: none` CSS property set, then Headless Chromium
 won't be able to click on this element and will throw an `invisibleElement` error, because it won't be able to determine
