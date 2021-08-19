@@ -1,5 +1,14 @@
 # Changelog
 
+## 13.1.0 (19.08.2021)
+
+Now `performMouseAction` checks for overlapping node.
+
+Exisiting tests might be broken due to the fact, that now this method and its
+derivatives throw an error instead of making an action. But they were already 
+broken earlier, so this version actually fixes the behaviour.
+
+
 ## 13.0.0 (01.07.2021)
 
 Updated `puppeteer` to ^10.1.0.
