@@ -1,5 +1,12 @@
 # Changelog
 
+## 14.0.0 (23.08.2021)
+
+Now `performMouseAction` scrolls to the passed element when it's not in the viewport.
+
+This is a breaking change and it may affect all the current tests due to the side effects that are caused by the scroll.
+
+
 ## 13.1.0 (19.08.2021)
 
 Now `performMouseAction` checks for overlapping node.
