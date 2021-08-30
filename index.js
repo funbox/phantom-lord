@@ -25,7 +25,15 @@ const proxyHandler = {
  * @returns {Promise<string>}
  */
 async function stringifyMessageHandle(handle) {
-  const res = await handle.executionContext().evaluate(m => String((m && m.stack) || m), handle);
+  const res = await handle.executionContext().evaluate(m => {
+    const valueToStringify = (m && m.stack) || m;
+
+    if (typeof valueToStringify === 'object') {
+      return JSON.stringify(valueToStringify);
+    }
+
+    return String(valueToStringify);
+  }, handle);
   return res;
 }
 
