@@ -1,5 +1,31 @@
 # Changelog
 
+## 14.1.0 (30.08.2021)
+
+We've improved debug logging a bit.
+
+Earlier when user run Phantom Lord with `DEBUG=1` and there were logged objects in DevTools, 
+the objects were printed in debug logs like this:
+
+```
+filename.js verbose: CONSOLE: [object Object]
+```
+
+Now every logged object or array, or anything is readable:
+
+```
+filename.js verbose: CONSOLE: 1
+filename.js verbose: CONSOLE: string
+filename.js verbose: CONSOLE: null
+filename.js verbose: CONSOLE: undefined
+filename.js verbose: CONSOLE: [1,2,3]
+filename.js verbose: CONSOLE: {"a":1}
+filename.js verbose: CONSOLE: Symbol(symbol)
+filename.js verbose: CONSOLE: () => {}
+filename.js verbose: CONSOLE: function fn() {}
+```
+
+
 ## 14.0.0 (23.08.2021)
 
 Now `performMouseAction` scrolls to the passed element when it's not in the viewport.
@@ -11,7 +37,7 @@ This is a breaking change and it may affect all the current tests due to the sid
 
 Now `performMouseAction` checks for overlapping node.
 
-Exisiting tests might be broken due to the fact, that now this method and its
+Existing tests might be broken due to the fact, that now this method and its
 derivatives throw an error instead of making an action. But they were already 
 broken earlier, so this version actually fixes the behaviour.
 
