@@ -17,8 +17,9 @@
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
-    "test": "mocha",
-    "lint": "eslint --cache -c .eslintrc --ext .js ./"
+    "lint": "eslint --cache -c .eslintrc --ext .js ./",
+    "prepublishOnly": "lawyer",
+    "test": "mocha"
   },
   "dependencies": {
     "app-root-path": "2.1.0",
