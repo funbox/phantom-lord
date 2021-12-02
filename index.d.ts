@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import { PuppeteerLifeCycleEvent } from 'puppeteer';
 
 declare class RemoteBrowser extends EventEmitter {
   public state: 'notStarted' | 'starting' | 'started' | 'exiting';
@@ -62,7 +63,11 @@ declare class RemoteBrowser extends EventEmitter {
 
   hover(selector: Selector, elementX?: number, elementY?: number): Promise<void|never>;
 
-  open(url: string): Promise<void|never>;
+  open(url: string, options?: {
+    referer?: string;
+    timeout?: number;
+    waitUntil?: PuppeteerLifeCycleEvent | PuppeteerLifeCycleEvent[];
+  }): Promise<void|never>;
 
   scrollSelectorToBottom(selector: Selector): Promise<void|never>;
 
