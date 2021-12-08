@@ -1,5 +1,10 @@
 # Changelog
 
+## 14.2.0 (08.12.2021)
+
+Support passing options to Puppeteer's `goto` in `open` command.
+
+
 ## 14.1.0 (30.08.2021)
 
 We've improved debug logging a bit.
