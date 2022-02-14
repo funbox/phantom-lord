@@ -1,5 +1,19 @@
 # Changelog
 
+## 15.0.0 (14.02.2022)
+
+Updated `puppeteer` to ^13.3.2 to fix [CVE-2022-0235](https://github.com/advisories/GHSA-r683-j2x4-v87g).
+
+If you depend on the Puppeteer's API then you should check this release notes
+for breaking changes:
+[v11.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v11.0.0),
+[v12.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v12.0.0),
+[v13.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v13.0.0).
+
+Also removed default values for first params of commands `expectSelector` and `expectVisibilityState`.
+Now the values should be passed explicitly.
+
+
 ## 14.2.0 (08.12.2021)
 
 Support passing options to Puppeteer's `goto` in `open` command.
