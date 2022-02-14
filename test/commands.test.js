@@ -2,7 +2,7 @@ const fs = require('fs');
 const resolvePath = require('path').resolve;
 const { describe, it } = require('mocha');
 const commands = require('../lib/commands');
-const RemoteBrowser = require('../');
+const RemoteBrowser = require('..');
 
 const declFilePath = resolvePath(__dirname, '../index.d.ts');
 const skipMethods = ['sendCmd', 'deleteLocalStorageBaseDir'];
