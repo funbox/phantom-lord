@@ -17,7 +17,7 @@
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
-    "lint": "eslint --cache -c .eslintrc --ext .js ./",
+    "lint": "eslint --cache --ext .js ./",
     "prepublishOnly": "lawyer",
     "test": "mocha"
   },
@@ -28,8 +28,8 @@
     "winston": "3.0.0"
   },
   "devDependencies": {
-    "@funboxteam/eslint-config": "5.1.0",
-    "eslint": "5.16.0",
-    "mocha": "8.2.0"
+    "@funboxteam/eslint-config": "7.1.0",
+    "eslint": "7.32.0",
+    "mocha": "9.2.0"
   }
 }

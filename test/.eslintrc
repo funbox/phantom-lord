@@ -1,0 +1,3 @@
+{
+  "extends": "@funboxteam/eslint-config/tests"
+}

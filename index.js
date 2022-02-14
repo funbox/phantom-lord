@@ -56,6 +56,8 @@ class RemoteBrowser extends EventEmitter {
     this.onCloseCallback = (...args) => { onCloseCb(this, 'close', ...args); };
     this.onExitCallback = (...args) => { onCloseCb(this, 'exit', ...args); };
 
+    // we are using Proxy here so returning is fine
+    // eslint-disable-next-line no-constructor-return
     return new Proxy(this, proxyHandler);
   }
 
@@ -159,7 +161,7 @@ class RemoteBrowser extends EventEmitter {
     }
   }
 
-  async exit() {
+  exit() {
     if (this.page) {
       this.page.removeAllListeners('console');
     }
@@ -172,7 +174,8 @@ class RemoteBrowser extends EventEmitter {
     this.state = STATE.EXITING;
 
     const startWaitingTime = +new Date();
-    return new Promise(async (resolve, reject) => {
+
+    return new Promise((resolve, reject) => {
       const self = this;
       const notKilled = () => {
         debug(`debug: browser state: ${this.state}`, 'debug');
@@ -188,19 +191,21 @@ class RemoteBrowser extends EventEmitter {
       function waiter() {
         if (self.state === STATE.NOT_STARTED) {
           resolve();
-        } else notKilled();
+        } else {
+          notKilled();
+        }
       }
 
-      await (() => new Promise((CDPResolve) => {
+      new Promise((CDPResolve) => {
         const CDPWaiter = setInterval(() => {
           if (!self.CDPConnectionsInProgress) {
             clearInterval(CDPWaiter);
             CDPResolve();
           }
         }, 5);
-      }))();
-      await this.chromium.close();
-      waiter();
+      })
+        .then(() => this.chromium.close())
+        .then(() => waiter());
     });
   }
 
@@ -227,6 +232,5 @@ RemoteBrowser.prototype.HEADLESS = !(process.env.HEADLESS_OFF || browserArgs.hea
 RemoteBrowser.deleteLocalStorageBaseDir = function () { // eslint-disable-line func-names
   debug('Deprecation warning: deleteLocalStorageBaseDir should not be fired anymore.', 'warn');
 };
-
 
 module.exports = RemoteBrowser;
