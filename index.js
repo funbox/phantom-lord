@@ -119,6 +119,12 @@ class RemoteBrowser extends EventEmitter {
           debug(`Redirected to ${frame.url()}`, 'info');
         });
 
+        if (this.CLEAR_COOKIES) {
+          const client = await target.createCDPSession();
+
+          await client.send('Storage.clearCookies');
+        }
+
         if (this.requestInterceptor) {
           await page.setRequestInterception(true);
           page.on('request', (request) => {
@@ -227,6 +233,7 @@ class RemoteBrowser extends EventEmitter {
 RemoteBrowser.prototype.WAIT_TIMEOUT = browserArgs.waitTimeout || 30000;
 RemoteBrowser.prototype.CHECK_INTERVAL = process.env.E2E_TESTS_WITH_PAUSES ? 300 : 50;
 RemoteBrowser.prototype.SLOW_MO = browserArgs.slowMo || 0;
+RemoteBrowser.prototype.CLEAR_COOKIES = browserArgs.clearCookies || false;
 RemoteBrowser.prototype.HEADLESS = !(process.env.HEADLESS_OFF || browserArgs.headlessOff);
 
 RemoteBrowser.deleteLocalStorageBaseDir = function () { // eslint-disable-line func-names
