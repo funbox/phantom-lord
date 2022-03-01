@@ -1,5 +1,10 @@
 # Changelog
 
+## 15.1.0 (01.03.2022)
+
+Added an ability to automatically clear cookies during a new page creation.
+
+
 ## 15.0.0 (14.02.2022)
 
 Updated `puppeteer` to ^13.3.2 to fix [CVE-2022-0235](https://github.com/advisories/GHSA-r683-j2x4-v87g).
