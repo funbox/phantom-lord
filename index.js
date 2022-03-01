@@ -43,6 +43,7 @@ class RemoteBrowser extends EventEmitter {
     this.state = STATE.NOT_STARTED;
     this.chromium = null;
     this.page = null;
+    this.sessionCDP = null;
     this.cmdId = 0;
     this.browserErrors = [];
     this.stubsQueue = [];
@@ -120,9 +121,9 @@ class RemoteBrowser extends EventEmitter {
         });
 
         if (this.CLEAR_COOKIES) {
-          const client = await target.createCDPSession();
+          this.sessionCDP = await target.createCDPSession();
 
-          await client.send('Storage.clearCookies');
+          await this.sessionCDP.send('Storage.clearCookies');
         }
 
         if (this.requestInterceptor) {
@@ -152,6 +153,13 @@ class RemoteBrowser extends EventEmitter {
     this.browserErrors = [];
 
     if (this.page) {
+      const connection = this.sessionCDP && await this.sessionCDP.connection();
+
+      if (connection) {
+        await this.sessionCDP.detach();
+        this.sessionCDP = null;
+      }
+
       await this.page.close();
       this.page = null;
     }
