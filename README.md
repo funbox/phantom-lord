@@ -309,6 +309,7 @@ console.log(`Current state: ${browser.state}`);
     * `slowMo` — number; slows evaluation of every command on the passed milliseconds (default: `0`). 
       The difference between this key and `E2E_TESTS_WITH_PAUSES` env var is the fact that `slowMo` affects all the actions
       that work with the browser (clicks, navigation, data inputs, keys pressing, etc).
+    * `clearCookies` — boolean; clears browser cookies when creating a new page (default: `false`); 
 * `E2E_TESTS_WITH_PAUSES` — boolean; increases the delay between waiting commands evaluation (`waitForUrl`, `waitForText`, etc).
   It helps to find errors related to too fast checks evaluation.
 * `HEADLESS_OFF` — boolean; turns off Headless mode. The browser will launch with GUI, which will allow to see commands 

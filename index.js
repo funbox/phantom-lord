@@ -43,6 +43,7 @@ class RemoteBrowser extends EventEmitter {
     this.state = STATE.NOT_STARTED;
     this.chromium = null;
     this.page = null;
+    this.sessionCDP = null;
     this.cmdId = 0;
     this.browserErrors = [];
     this.stubsQueue = [];
@@ -119,6 +120,12 @@ class RemoteBrowser extends EventEmitter {
           debug(`Redirected to ${frame.url()}`, 'info');
         });
 
+        if (this.CLEAR_COOKIES) {
+          this.sessionCDP = await target.createCDPSession();
+
+          await this.sessionCDP.send('Storage.clearCookies');
+        }
+
         if (this.requestInterceptor) {
           await page.setRequestInterception(true);
           page.on('request', (request) => {
@@ -146,6 +153,13 @@ class RemoteBrowser extends EventEmitter {
     this.browserErrors = [];
 
     if (this.page) {
+      const connection = this.sessionCDP && await this.sessionCDP.connection();
+
+      if (connection) {
+        await this.sessionCDP.detach();
+        this.sessionCDP = null;
+      }
+
       await this.page.close();
       this.page = null;
     }
@@ -227,6 +241,7 @@ class RemoteBrowser extends EventEmitter {
 RemoteBrowser.prototype.WAIT_TIMEOUT = browserArgs.waitTimeout || 30000;
 RemoteBrowser.prototype.CHECK_INTERVAL = process.env.E2E_TESTS_WITH_PAUSES ? 300 : 50;
 RemoteBrowser.prototype.SLOW_MO = browserArgs.slowMo || 0;
+RemoteBrowser.prototype.CLEAR_COOKIES = browserArgs.clearCookies || false;
 RemoteBrowser.prototype.HEADLESS = !(process.env.HEADLESS_OFF || browserArgs.headlessOff);
 
 RemoteBrowser.deleteLocalStorageBaseDir = function () { // eslint-disable-line func-names
