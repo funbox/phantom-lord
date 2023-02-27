@@ -1,5 +1,11 @@
 # Changelog
 
+## 15.2.0 (27.02.2023)
+
+Improved cookie setting process. Now cookies are set prior to opening a new page. 
+Which means that request for that page now includes cookies that have been set.
+
+
 ## 15.1.0 (01.03.2022)
 
 Added an ability to automatically clear cookies during a new page creation.
