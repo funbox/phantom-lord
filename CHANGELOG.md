@@ -1,5 +1,12 @@
 # Changelog
 
+## 16.0.0 (07.06.2023)
+
+Dropped Node.js 12 support.
+
+The lib probably should still work with it, but you'd better check first.
+
+
 ## 15.2.0 (27.02.2023)
 
 Improved cookie setting process. Now cookies are set prior to opening a new page. 

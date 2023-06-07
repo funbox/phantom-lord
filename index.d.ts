@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import { PuppeteerLifeCycleEvent } from 'puppeteer';
 
 declare class RemoteBrowser extends EventEmitter {

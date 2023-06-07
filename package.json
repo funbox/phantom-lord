@@ -1,6 +1,6 @@
 {
   "name": "@funboxteam/phantom-lord",
-  "version": "15.2.0",
+  "version": "16.0.0",
   "description": "Handy API for Headless Chromium",
   "repository": {
     "type": "git",
@@ -28,7 +28,7 @@
     "winston": "3.0.0"
   },
   "devDependencies": {
-    "@funboxteam/eslint-config": "7.1.0",
+    "@funboxteam/eslint-config": "7.3.0",
     "eslint": "7.32.0",
     "mocha": "9.2.2"
   }
