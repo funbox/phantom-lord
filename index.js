@@ -1,4 +1,4 @@
-const EventEmitter = require('events').EventEmitter;
+const EventEmitter = require('node:events').EventEmitter;
 const puppeteer = require('puppeteer');
 
 const commandsList = require('./lib/commands');

@@ -1,5 +1,5 @@
-const fs = require('fs');
-const resolvePath = require('path').resolve;
+const fs = require('node:fs');
+const resolvePath = require('node:path').resolve;
 const { describe, it } = require('mocha');
 const commands = require('../lib/commands');
 const RemoteBrowser = require('..');
